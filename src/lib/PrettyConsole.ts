@@ -8,7 +8,9 @@ const logLevels = {
   info:   30,
   warn:   40,
   error:  50,
-  fatal:  60 
+  fatal:  60,
+  log:    90,
+  silent: 100 
 } as const;
 
 /** Log level type */
@@ -18,7 +20,22 @@ export type LogLevel = keyof typeof logLevels;
 export type CompareFn = <T>(a: T, b: T) => number;
 
 /** Type of the console replacement object */
-export type LogProvider = Pick<Console,  'log' | 'error' | 'warn' | 'info' | 'debug'>;
+export type LogProvider = Pick<Console,  'log' | 'error' | 'warn' | 'info' | 'debug' | 'trace'> & { fatal?: (...a: unknown[]) => void };
+
+/** Log method type */
+export type LogMethod = keyof LogProvider; 
+
+/** LogEntry type */
+export interface LogEntry {
+  /** Log output time. */
+  timestamp: Date;
+
+  /** Logging method. */
+  method: LogMethod;
+
+  /** The arguments themselves passed to the log output function. */
+  args: unknown[];
+}
 
 /**
  * configuration definition. 
@@ -38,6 +55,7 @@ export interface Config {
    *  - 'warn':   Output logs for 'warn' and higher levels.
    *  - 'error':  Output logs for 'error' and 'fatal' levels.
    *  - 'fatal':  Output logs only for the 'fatal' level.
+   *  - 'silent': No output logs.
    * If omitted, defaults to `'info'`.
    */
   level?: LogLevel;
@@ -51,8 +69,10 @@ export interface Config {
 
   /**
    * Whether to output logging level name. 
-   * If set to `true`, the log level name 
-   * (`TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `FATAL`) is output.
+   * If set to `true`, the log level name is output.
+   * For each call to `trace()`, `debug()`, `info()`, `warn()`, `error()`, and `fatal()`, 
+   * the corresponding `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, and `FATAL` is output.
+   * Since `log()` is level-agnostic, the `Level Name` is not output when `log()` is used.
    * If omitted, defaults to `true`.
    */
   levelName?: boolean
@@ -75,7 +95,17 @@ export interface Config {
    * Alternative to `console`.
    * If omitted, `console` is used.
    */
-  provider? : LogProvider;
+  provider?: LogProvider;
+
+  /**
+   * Whether or not to use PrettyConsole's `pretty` output.
+   */
+  pretty?: boolean;
+
+  /**
+   * A callback function that receives each log call before level filtering and formatting.
+   */
+  onLog?: (logEntry: LogEntry) => void;
 
   /**
    * Specifies the length at which input values are split across multiple lines.
@@ -155,23 +185,28 @@ export type ConfigKey = keyof Config;
  *
  * It keeps the familiar console API while adding a few small conveniences for everyday development.
  * 
+ * However, debugging tasks such as file I/O, mutual exclusion, and asynchronous processing became complex, 
+ * and I found myself wanting a logger capable of writing to a file.
+ * For this reason, decided to include functionality to integrate with a standard file logger.
+ *  
  * ### Features
  * 
  * - Displays deeply nested objects using `util.inspect()`.
- * - Supports configurable log levels (`'trace'`, `'debug'`, `'info'`, `'warn'`, `'error'`, and `'fatal'`).
+ * - Supports configurable log levels (`'trace'`, `'debug'`, `'info'`, `'warn'`, `'error'`, `'fatal'`, and `'silent'`).
  * - Optional timestamps.
  * - Optional colored output.
  * - Configurable formatting options.
- * - Lightweight with no external runtime dependencies.
- * 
+ * - Optional console-compatible external logger injection.
+ * - Optional callback function to receive each log call before formatting. It is convenient when integrating with a file logger.
+ *  
  * The goal is not to replace logging frameworks such as {@link https://www.npmjs.com/package/pino Pino} or {@link https://www.npmjs.com/package/winston Winston}, but to make the built-in console more pleasant to use during development.
  */
 export class PrettyConsole {
 
   /** 
-   * Private fields
+   * Static fields
    */
-  /** Default logging leve */
+  /** Default logging level */
   private static readonly defaultLevel: LogLevel = 'info';
 
   /** Default stackTraceLimit */
@@ -185,6 +220,7 @@ export class PrettyConsole {
     callStack:        false,
     stackTraceLimit:  PrettyConsole.defaultStackTraceLimit,
     provider:         console,
+    pretty:           true,
     breakLength:      120,
     colors:           true,
     compact:          false,
@@ -193,12 +229,32 @@ export class PrettyConsole {
     maxStringLength:  12800,
     sorted:           true,
   };
+
+  /** 
+   * Static methods
+   */
   
+  /**
+   * Get default configuration.
+   * @returns Default configuration.
+   */
+  public static getDefaultConfig(): Config {
+    return {...PrettyConsole.defaultConf};
+  }
+
+  /** 
+   * Instance fields
+   */
+
   /** Current configuration */
-  private config: Config = { ...PrettyConsole.defaultConf };
+  #config: Config = { ...PrettyConsole.defaultConf };
+
+  /** Logger. */
+  #logger: LogProvider = console;
+
 
   /**
-   * Public methods
+   * Instance methods
    */
 
   /**
@@ -211,10 +267,11 @@ export class PrettyConsole {
 
   /**
    * Set configuration.
-   * @param config  configuration
+   * @param config configuration
    */
   public setConfig(config: Config): void {
-    this.config = this.resolvedConfig(config);
+    this.#config = this.#resolvedConfig(config);
+    this.#logger = this.#resolveLogger(this.#config.provider);
   }
 
   /**
@@ -222,22 +279,14 @@ export class PrettyConsole {
    * @returns Current configuration.
    */
   public getConfig(): Config {
-    return {...this.config};
+    return {...this.#config};
   }
 
   /**
    * Reset current configuration
    */
   public resetConfig(): void {
-    this.config = {...PrettyConsole.defaultConf};
-  }
-
-  /**
-   * Get default configuration.
-   * @returns Default configuration.
-   */
-  public static getDefaultConfig(): Config {
-    return {...PrettyConsole.defaultConf};
+    this.setConfig(PrettyConsole.defaultConf);
   }
 
   /**
@@ -249,11 +298,11 @@ export class PrettyConsole {
   }
 
   /**
-   * Always output information, regardless of the log level.
+   * Output information without a level name. No output is produced when the configured level is `silent`.
    * @param args  An array of values ​​to be output.
    */
   public log(...args: any[]) {
-    this.output(null, args, this.getLogger().log);
+    this.#output('log', args, (...a) => (this.#logger.log ?? this.#logger.info)(...a));
   }
 
   /**
@@ -262,15 +311,15 @@ export class PrettyConsole {
    * @param args  An array of values ​​to be output.
    */
   public trace(...args: any[]) {
-    if (this.config.callStack) {
+    if (this.#config.callStack) {
       const prev = Error.stackTraceLimit;
-      Error.stackTraceLimit = this.config.stackTraceLimit ?? PrettyConsole.defaultStackTraceLimit;
+      Error.stackTraceLimit = this.#config.stackTraceLimit ?? PrettyConsole.defaultStackTraceLimit;
       const err = new Error(' ');
       Error.stackTraceLimit = prev;  
       err.stack = err.stack ? err.stack.replace('Error', 'Call stack') : `Call stack: couldn't get`;
       args.push('\n' + err.stack);
     }
-    this.output('trace', args, this.getLogger().debug);
+    this.#output('trace', args, (...a) => this.#logger.trace(...a));
   }
 
   /**
@@ -278,7 +327,7 @@ export class PrettyConsole {
    * @param args  An array of values ​​to be output.
    */
   public debug(...args: any[]) {
-    this.output('debug', args, this.getLogger().debug);
+    this.#output('debug', args, (...a) => this.#logger.debug(...a));
   }
 
   /**
@@ -286,7 +335,7 @@ export class PrettyConsole {
    * @param args  An array of values ​​to be output.
    */
   public info(...args: any[]) {
-    this.output('info', args, this.getLogger().info);
+    this.#output('info', args, (...a) => this.#logger.info(...a));
   }
 
   /**
@@ -294,7 +343,7 @@ export class PrettyConsole {
    * @param args  An array of values ​​to be output.
    */
   public warn(...args: any[]) {
-    this.output('warn', args, this.getLogger().warn);
+    this.#output('warn', args, (...a) => this.#logger.warn(...a));
   }
 
   /**
@@ -302,7 +351,7 @@ export class PrettyConsole {
    * @param args  An array of values ​​to be output.
    */
   public error(...args: any[]) {
-    this.output('error', args, this.getLogger().error);
+    this.#output('error', args, (...a) => this.#logger.error(...a));
   }
 
   /**
@@ -310,20 +359,29 @@ export class PrettyConsole {
    * @param args  An array of values ​​to be output.
    */
   public fatal(...args: any[]) {
-    this.output('fatal', args, this.getLogger().error);
+    this.#output('fatal', args, (...a) => (this.#logger.fatal ?? this.#logger.error)(...a));
   }
 
   /**
-   * Private methods
+   * Check whether to output logs.
+   * @param method Log method.
+   * @returns true if `method` is enabled by the current log level, and false otherwise.
    */
+  #shouldLog(method: LogMethod): boolean {
+    return logLevels[method as LogLevel] >= logLevels[this.#config.level ?? PrettyConsole.defaultLevel];
+  }
 
   /**
-   * Check whether to output logs.
-   * @param level Log level
-   * @returns true if `level` is `null` or `level` >= `level of the current setting`, and false otherwise.
+   * Resolve the console-compatible logger from the configured provider.
    */
-  private shouldLog(level: LogLevel | null): boolean {
-    return !level || logLevels[level] >= logLevels[this.config.level ?? PrettyConsole.defaultLevel];
+  #resolveLogger(provider: LogProvider | undefined): LogProvider {
+    if (provider === undefined || provider === console) {
+      const logger = {...console as LogProvider};
+      // Replace `console.trace()` with `debug()` because its default behavior prints a stack trace.
+      logger.trace = logger.debug;
+      return logger;
+    }
+    return provider;
   }
 
   /**
@@ -333,7 +391,7 @@ export class PrettyConsole {
    * @param config  
    * @returns Resolved configuration
   */
-  private resolvedConfig(config: Config): Config {
+  #resolvedConfig(config: Config): Config {
     const rConf = {...config};
     const checkType = <K extends keyof Config>(key: K , typeChecker: (v: Config[K]) => boolean) => {
       if (Object.hasOwn(config, key)) {
@@ -348,13 +406,26 @@ export class PrettyConsole {
     checkType('timestamp',      (v) => typeof v === 'boolean');
     checkType('levelName',      (v) => typeof v === 'boolean');
     checkType('callStack',      (v) => typeof v === 'boolean');
-    checkType('stackTraceLimit',(v) => typeof v === 'number');
-    checkType('breakLength',    (v) => typeof v === 'number');
+    checkType('stackTraceLimit',(v) => typeof v === 'number' );
+    checkType('provider',       
+      (v) => {
+        const lg = v as any; 
+        return Boolean(lg)  &&
+          Boolean(lg.log)   &&
+          Boolean(lg.trace) &&
+          Boolean(lg.debug) &&
+          Boolean(lg.info)  &&
+          Boolean(lg.warn)  &&
+          Boolean(lg.error);
+      }
+    );
+    checkType('pretty',         (v) => typeof v === 'boolean');
+    checkType('breakLength',    (v) => typeof v === 'number' );
     checkType('colors',         (v) => typeof v === 'boolean');
     checkType('compact',        (v) => typeof v === 'boolean' || typeof v === 'number');
-    checkType('depth',          (v) => typeof v === 'number' || v === null);
-    checkType('maxArrayLength', (v) => typeof v === 'number' || v === null);
-    checkType('maxStringLength',(v) => typeof v === 'number' || v === null);
+    checkType('depth',          (v) => typeof v === 'number'  || v === null);
+    checkType('maxArrayLength', (v) => typeof v === 'number'  || v === null);
+    checkType('maxStringLength',(v) => typeof v === 'number'  || v === null);
     checkType('sorted',         (v) => typeof v === 'boolean' || typeof v === 'function');
 
     // Fill options with default values, and return.
@@ -364,69 +435,85 @@ export class PrettyConsole {
   /**
    * Format the values ​​in the array.
    * 
-   * @internal
    * @param args  An array of values ​​to be output.
-   * @returns An array of formatted values ​​to be output.
+   * @param date
+   * @returns An array of formatted values ​​to be output, or a `string`.
    */
-  private format(args: any[]): any[] {
-    return args.map((value: any) => {
-      if (value instanceof Error) {
-        return value;
-      }
-      if (typeof value === "object" && value !== null) {
-        return util.inspect(value, this.config);
-      }
-      return value;
-    });
+  #format(method: LogMethod, date: Date, args: any[]): any[] {
+    args = this.#addPrefixes(method, args);
+    args = this.#addTimestamp(date, args);
+    return this.#toPretty(args);
   }
 
   /**
    * Format a Date instance or UTC time (in milliseconds). 
    * 
-   * @internal
-   * @param date    `Date` instance or UTC time (in milliseconds)
+   * @param date    `Date` instance.
    * @returns A formatted datetime string.
    */
-  private formatDate(date: Date | number) {
+  #formatDate(date: Date) {
     return DateFormatter.format(new Date(date), "yyyy-MM-dd HH:mm:ss.fff");
   }
 
   /**
    * Add a prefix to the array of output values.
    * 
-   * @internal
    * @param args  An array of values ​​to be output.
-   * @param level Log level
+   * @param method Log method name.
    * @returns An array of output values ​​with a prefix added.
    */
-  private addPrefixes(args: any[], level: LogLevel | null): any[] {
-    if (level && this.config.levelName) args.unshift(`${level.toUpperCase()}:`);
-    if (this.config.timestamp) args.unshift(`[${this.formatDate(Date.now())}]`);
+  #addPrefixes(method: LogMethod, args: any[]): any[] {
+    if (method !== 'log' && this.#config.levelName) args.unshift(`${method.toUpperCase()}:`);
+    return args;
+  }
+
+  #addTimestamp(date: Date, args: any[]): any[] {
+    if (this.#config.timestamp) args.unshift(`[${this.#formatDate(date)}]`);
     return args;
   }
 
   /**
-   * Output log
+   * Output log.
    * 
-   * @internal
-   * @param level Log level
+   * @param method Log method.
    * @param args  An array of values ​​to be output.
    * @param logFn Function to output the log.
    */
-  private output(level: LogLevel | null, args: any[], logFn: (...a: any[]) => void): void {
-    if (this.shouldLog(level)) {
-      logFn(...this.format(this.addPrefixes(args, level)));
+  #output(method: LogMethod, args: any[], logFn: (...a: any[]) => void): void {
+    const date: Date = new Date();
+    if (this.#config.onLog) {
+      const logEntry: LogEntry = this.#getLogEntry(method, date, args);
+      this.#config.onLog(logEntry);
+    }
+    if (this.#shouldLog(method)) {
+      logFn(...this.#format(method, date, args));
     }
   }
 
   /**
-   * Get logger obect
-   * 
-   * @internal
+   * Obtain the log information to be passed to `Config.onLog`.
    */
-  private getLogger(): LogProvider {
-    return this.config.provider ? this.config.provider : console;
+  #getLogEntry(method: LogMethod, date: Date, args: unknown[]): LogEntry {
+    return { timestamp: date, method, args }
+  }
+
+  /**
+   * Format the log arguments as specified. This is one of the purposes of this library.
+   */ 
+  #toPretty(args: any[]): any[] {
+    return Boolean(this.#config.pretty) === false ? 
+      args : 
+      args.map((value: any) => {
+      if (value instanceof Error) {
+        return value;
+      }
+      if (typeof value === "object" && value !== null) {
+        return util.inspect(value, this.#config);
+      }
+      return value;
+    });
   }
 
 }
+
 

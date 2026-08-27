@@ -1,6 +1,6 @@
 {
   "name": "@ayapapa-npm/pretty-console-js",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "description": "A tiny wrapper around the standard Node.js `console`.",
   "license": "MIT",
   "author": "ayapapa",
@@ -14,8 +14,7 @@
     }
   },
   "files": [
-    "dist",
-    "images"
+    "dist"
   ],
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --out-dir dist --clean --dts",
@@ -29,6 +28,7 @@
   },
   "devDependencies": {
     "@types/node": "^26.2.0",
+    "pino": "^10.3.1",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
     "vitest": "^4.1.10"

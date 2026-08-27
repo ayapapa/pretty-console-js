@@ -3,6 +3,36 @@
 
 A tiny wrapper around the standard Node.js `console`.
 
+PrettyConsole is a small utility for making console log output a little easier to read.
+It can also convert each log entry into a single-line JSON string and pass it to a user-provided writer function.
+When integrating with an external logger, the generated string should be written appropriately for that logger, rather than passed directly to its message API.
+
+Pino
+
+import pino from 'pino';
+
+const dest = pino.destination('./app.log');
+
+const pretty = new PrettyConsole({
+  externalWriter(jsonLine) {
+    dest.write(jsonLine + '\n');
+  },
+});
+
+
+Winston
+
+import fs from 'node:fs';
+
+const stream = fs.createWriteStream('./app.log', { flags: 'a' });
+
+const pretty = new PrettyConsole({
+  externalWriter(jsonLine) {
+    stream.write(jsonLine + '\n');
+  },
+});
+
+
 ## Why?
 
 While developing Node.js libraries, I found myself using `console` for most debugging tasks because it is simple and always available. However, I often wanted a few extra features without introducing a full-featured logging framework.
@@ -11,6 +41,11 @@ So I created **pretty-console**.
 
 It keeps the familiar `console` API while adding a few small conveniences for everyday development.
 
+Furthermore, as debugging tasks grew more complex—involving elements such as file I/O, 
+mutual exclusion, and asynchronous processing—I keenly felt the need for a logger capable of writing to files.
+
+To address this, I added functionality to integrate with a standard file logger.
+
 ## Features
 
 * Deeply nested objects are displayed using [`util.inspect()`](https://nodejs.org/api/util.html#utilinspectobject-options).
@@ -18,7 +53,8 @@ It keeps the familiar `console` API while adding a few small conveniences for ev
 * Optional timestamps.
 * Optional colored output.
 * Configurable formatting options.
-* Lightweight with no external runtime dependencies.
+* Optional a console-compatible external logger injection. 
+* Optional callback function to receive arguments to be passed console. It is convenient to integrate with a file logger.
 
 The goal is **not** to replace logging frameworks such as [Pino](https://www.npmjs.com/package/pino) or [Winston](https://www.npmjs.com/package/winston), but to make the built-in `console` more pleasant to use during development.
 
