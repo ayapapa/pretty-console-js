@@ -19,7 +19,7 @@ export type LogLevel = keyof typeof logLevels;
 /** Compare function type */
 export type CompareFn = <T>(a: T, b: T) => number;
 
-/** Type of the console replacement object */
+/** Type of the console replacement object. */
 export type LogProvider = Pick<Console,  'log' | 'error' | 'warn' | 'info' | 'debug' | 'trace'> & { fatal?: (...a: unknown[]) => void };
 
 /** Log method type */
@@ -83,13 +83,6 @@ export interface Config {
    * If omitted, defaults to `false`.
    */
   callStack?: boolean;
-
-  /**
-   * Upper limit on the number of stack frames. 
-   * Specifies the number of stack frames collected by a stack trace.
-   * If omitted, defaults to `10`.
-   */
-  stackTraceLimit?: number;
 
   /**
    * Alternative to `console`.
@@ -209,16 +202,12 @@ export class PrettyConsole {
   /** Default logging level */
   private static readonly defaultLevel: LogLevel = 'info';
 
-  /** Default stackTraceLimit */
-  private static readonly defaultStackTraceLimit: number = 10;
-
   /** Default configuration */
   private static readonly defaultConf: Config  = {
     level:            PrettyConsole.defaultLevel,
     timestamp:        true,
     levelName:        true,
     callStack:        false,
-    stackTraceLimit:  PrettyConsole.defaultStackTraceLimit,
     provider:         console,
     pretty:           true,
     breakLength:      120,
@@ -301,7 +290,7 @@ export class PrettyConsole {
    * Output information without a level name. No output is produced when the configured level is `silent`.
    * @param args  An array of values ​​to be output.
    */
-  public log(...args: any[]) {
+  public log(...args: unknown[]) {
     this.#output('log', args, (...a) => (this.#logger.log ?? this.#logger.info)(...a));
   }
 
@@ -310,14 +299,12 @@ export class PrettyConsole {
    * If 'callStack' is true, the call stack is also output.
    * @param args  An array of values ​​to be output.
    */
-  public trace(...args: any[]) {
+  public trace(...args: unknown[]) {
     if (this.#config.callStack) {
-      const prev = Error.stackTraceLimit;
-      Error.stackTraceLimit = this.#config.stackTraceLimit ?? PrettyConsole.defaultStackTraceLimit;
-      const err = new Error(' ');
-      Error.stackTraceLimit = prev;  
-      err.stack = err.stack ? err.stack.replace('Error', 'Call stack') : `Call stack: couldn't get`;
-      args.push('\n' + err.stack);
+      const obj: { stack?: string } = {};
+      Error.captureStackTrace(obj, this.trace);
+      obj.stack = obj.stack ? obj.stack.replace('Error', 'Call stack') : `Call stack: couldn't get`;
+      args.push('\n' + obj.stack);
     }
     this.#output('trace', args, (...a) => this.#logger.trace(...a));
   }
@@ -326,7 +313,7 @@ export class PrettyConsole {
    * Output information at the 'debug' level.
    * @param args  An array of values ​​to be output.
    */
-  public debug(...args: any[]) {
+  public debug(...args: unknown[]) {
     this.#output('debug', args, (...a) => this.#logger.debug(...a));
   }
 
@@ -334,7 +321,7 @@ export class PrettyConsole {
    * Output information at the 'info' level.
    * @param args  An array of values ​​to be output.
    */
-  public info(...args: any[]) {
+  public info(...args: unknown[]) {
     this.#output('info', args, (...a) => this.#logger.info(...a));
   }
 
@@ -342,7 +329,7 @@ export class PrettyConsole {
    * Output information at the 'warn' level.
    * @param args  An array of values ​​to be output.
    */
-  public warn(...args: any[]) {
+  public warn(...args: unknown[]) {
     this.#output('warn', args, (...a) => this.#logger.warn(...a));
   }
 
@@ -350,7 +337,7 @@ export class PrettyConsole {
    * Output information at the 'error' level.
    * @param args  An array of values ​​to be output.
    */
-  public error(...args: any[]) {
+  public error(...args: unknown[]) {
     this.#output('error', args, (...a) => this.#logger.error(...a));
   }
 
@@ -358,7 +345,7 @@ export class PrettyConsole {
    * Output information at the 'fatal' level.
    * @param args  An array of values ​​to be output.
    */
-  public fatal(...args: any[]) {
+  public fatal(...args: unknown[]) {
     this.#output('fatal', args, (...a) => (this.#logger.fatal ?? this.#logger.error)(...a));
   }
 
@@ -406,17 +393,10 @@ export class PrettyConsole {
     checkType('timestamp',      (v) => typeof v === 'boolean');
     checkType('levelName',      (v) => typeof v === 'boolean');
     checkType('callStack',      (v) => typeof v === 'boolean');
-    checkType('stackTraceLimit',(v) => typeof v === 'number' );
     checkType('provider',       
       (v) => {
-        const lg = v as any; 
-        return Boolean(lg)  &&
-          Boolean(lg.log)   &&
-          Boolean(lg.trace) &&
-          Boolean(lg.debug) &&
-          Boolean(lg.info)  &&
-          Boolean(lg.warn)  &&
-          Boolean(lg.error);
+        return v != null  && Boolean(v.log) && Boolean(v.trace) && Boolean(v.debug) &&
+          Boolean(v.info)  && Boolean(v.warn)  && Boolean(v.error);
       }
     );
     checkType('pretty',         (v) => typeof v === 'boolean');
@@ -428,8 +408,8 @@ export class PrettyConsole {
     checkType('maxStringLength',(v) => typeof v === 'number'  || v === null);
     checkType('sorted',         (v) => typeof v === 'boolean' || typeof v === 'function');
 
-    // Fill options with default values, and return.
-    return {...PrettyConsole.defaultConf, ...rConf};
+    // Fill options with current values, and return.
+    return {...this.getConfig(), ...rConf};
   }
 
   /**
@@ -439,7 +419,7 @@ export class PrettyConsole {
    * @param date
    * @returns An array of formatted values ​​to be output, or a `string`.
    */
-  #format(method: LogMethod, date: Date, args: any[]): any[] {
+  #format(method: LogMethod, date: Date, args: unknown[]): unknown[] {
     args = this.#addPrefixes(method, args);
     args = this.#addTimestamp(date, args);
     return this.#toPretty(args);
@@ -462,12 +442,12 @@ export class PrettyConsole {
    * @param method Log method name.
    * @returns An array of output values ​​with a prefix added.
    */
-  #addPrefixes(method: LogMethod, args: any[]): any[] {
+  #addPrefixes(method: LogMethod, args: unknown[]): unknown[] {
     if (method !== 'log' && this.#config.levelName) args.unshift(`${method.toUpperCase()}:`);
     return args;
   }
 
-  #addTimestamp(date: Date, args: any[]): any[] {
+  #addTimestamp(date: Date, args: unknown[]): unknown[] {
     if (this.#config.timestamp) args.unshift(`[${this.#formatDate(date)}]`);
     return args;
   }
@@ -479,7 +459,7 @@ export class PrettyConsole {
    * @param args  An array of values ​​to be output.
    * @param logFn Function to output the log.
    */
-  #output(method: LogMethod, args: any[], logFn: (...a: any[]) => void): void {
+  #output(method: LogMethod, args: unknown[], logFn: (...a: unknown[]) => void): void {
     const date: Date = new Date();
     if (this.#config.onLog) {
       const logEntry: LogEntry = this.#getLogEntry(method, date, args);
@@ -500,10 +480,10 @@ export class PrettyConsole {
   /**
    * Format the log arguments as specified. This is one of the purposes of this library.
    */ 
-  #toPretty(args: any[]): any[] {
+  #toPretty(args: unknown[]): unknown[] {
     return Boolean(this.#config.pretty) === false ? 
       args : 
-      args.map((value: any) => {
+      args.map((value: unknown) => {
       if (value instanceof Error) {
         return value;
       }

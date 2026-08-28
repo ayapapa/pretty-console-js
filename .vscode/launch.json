@@ -38,6 +38,15 @@
         "<node_internals>/**",
         "${workspaceFolder}/node_modules/**"
       ]
+    },
+    {
+      "name": "Debug Current File",
+      "request": "launch",
+      "type": "node",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "program": "${file}"
     }
   ]
 }

@@ -50,7 +50,6 @@ describe('PrettyConsole', () => {
     expect(defConf.timestamp).toBe(true);
     expect(defConf.levelName).toBe(true);
     expect(defConf.callStack).toBe(false);
-    expect(defConf.stackTraceLimit).toBe(10);
     expect(defConf.breakLength).toBe(120);
     expect(defConf.colors).toBe(true);
     expect(defConf.compact).toBe(false);
@@ -69,7 +68,6 @@ describe('PrettyConsole', () => {
     timestamp: false,
     levelName: false,
     callStack: true,
-    stackTraceLimit: 20,
     provider: console,
     breakLength: 100,
     colors: false,
@@ -87,7 +85,6 @@ describe('PrettyConsole', () => {
     expect(conf.timestamp).toBe(testConf.timestamp);
     expect(conf.levelName).toBe(testConf.levelName);
     expect(conf.callStack).toBe(testConf.callStack);
-    expect(conf.stackTraceLimit).toBe(testConf.stackTraceLimit);
     expect(conf.provider).toBe(testConf.provider);
     expect(conf.breakLength).toBe(testConf.breakLength);
     expect(conf.colors).toBe(testConf.colors);
@@ -115,6 +112,49 @@ describe('PrettyConsole', () => {
     let conf = logger.getConfig();
     Object.assign(conf, testConf);
     expect(equalConfigs(logger.getDefaultConfig(), logger.getConfig())).toBe(true);
+  });
+/*
+  function copyProp<K extends keyof Config>(
+    target: Config,
+    source: Config,
+    key: K,
+  ): void {
+    target[key] = source[key];
+  }
+  */
+  it('Only the keys specified in `setConfig()` are modified.', () => {
+    const logger = new PrettyConsole();
+    const testConf: Config = {
+      level: "silent",
+      timestamp: false,
+      levelName: false,
+      callStack: true,
+      provider: createProvider(),
+      pretty: false,
+      breakLength: 99,
+      colors: false,
+      compact: true,
+      depth: 3,
+      maxArrayLength: 80,
+      maxStringLength: 10000,
+      sorted: false,
+    };
+    const keys = Object.keys(testConf) as Array<keyof Config>;
+    for (let i = 0; i < 2; i++) {
+      const conf = logger.getConfig();
+      const newConf: Config = {};
+      for (const key of keys) {
+        // Simply copy the same value from the same key in the Config.
+        // TS cannot select the key/value correlation here.
+        newConf[key] = testConf[key] as any;
+
+        logger.setConfig(newConf);
+
+        const curConf = logger.getConfig();
+        const expConf = { ...conf, ...newConf };
+        expect(equalConfigs(curConf, expConf)).toBeTruthy();;
+      }
+    }
   });
 
   const levelToProviderKey: Record<LogLevel, ProviderKey> = {
@@ -199,6 +239,7 @@ describe('PrettyConsole', () => {
   });
 
   const checkInvalidProperty = (key: ConfigKey , values: any[]) => {
+    expect.assertions(2 * values.length);
     values.forEach((v) => {
       const config: Config = {};
       config[key] = v;
@@ -207,8 +248,8 @@ describe('PrettyConsole', () => {
         logger = new PrettyConsole(config);
       }
       catch (err: any) {
-        expect(err instanceof Error).toBeTruthy();
-        expect(err.message.includes(`Type mismatch for config.${key}`)).toBeTruthy();
+        expect(err).instanceOf(Error);
+        expect(err.message).toContain(`Type mismatch for config.${key}`);
         //expect(() => logger.setConfig(config)).toThrow(`Type mismatch for config.${key}`);
       }
     });
@@ -230,10 +271,7 @@ describe('PrettyConsole', () => {
     checkInvalidProperty('callStack', [undefined, null, 'hoge', 0, {yes: 'no'}, new Error()]);
   });
 
-  it('invalid stackTraceLimit', () => {
-    checkInvalidProperty('stackTraceLimit', [undefined, null, 'hoge', true, {yes: 'no'}, new Error()]);
-  });
-  
+
   it('invalid breakLength', () => {
     checkInvalidProperty('breakLength', [undefined, null, 'hoge', true, {yes: 'no'}, new Error()]);
   });
@@ -277,9 +315,9 @@ describe('PrettyConsole', () => {
     // Get the output line.
     const line = stream.text().trim().split('\n')[0]
 
-    expects.forEach(s => expect(line.includes(s)).toBeTruthy());
+    expects.forEach(s => expect(line).toContain(s));
 
-    noExpects.forEach(s => expect(line.includes(s)).toBeFalsy());
+    noExpects.forEach(s => expect(line).not.toContain(s));
   };
 
   it('If `pretty` is `false` and inject `pino`, the output up to the second argument is logged via `pino`(object,num1,num2).', async () => {
@@ -297,11 +335,9 @@ describe('PrettyConsole', () => {
   });
 
   it('If `pretty` is `false` and inject `pino`, the output up to the second argument is logged via `pino`(num1,num2,string).', async () => {
-    const obj = { x: 124, y: "hello" };
     const num1 = 123456;
     const num2 = 0.00099;
     const str = "This is a string.";
-    const err = Object.assign(new Error("#ERROR#"), { code: "ETEST" });
 
     await testOutputString(
       [`"msg":${num1}`],
@@ -311,10 +347,7 @@ describe('PrettyConsole', () => {
   });
 
   it('If `pretty` is `false` and inject `pino`, the output up to the second argument is logged via `pino`(error,num2).', async () => {
-    const obj = { x: 124, y: "hello" };
-    const num1 = 123456;
     const num2 = 0.00099;
-    const str = "This is a string.";
     const err = Object.assign(new Error("#ERROR#"), { code: "ETEST" });
 
     await testOutputString(
@@ -325,11 +358,7 @@ describe('PrettyConsole', () => {
   });
 
   it('If `pretty` is `false` and inject `pino`, the output up to the second argument is logged via `pino`(array,num2).', async () => {
-    const obj = { x: 124, y: "hello" };
-    const num1 = 123456;
     const num2 = 0.00099;
-    const str = "This is a string.";
-    const err = Object.assign(new Error("#ERROR#"), { code: "ETEST" });
     const array = [1, 2, 3, 4,];
 
     await testOutputString(
@@ -349,18 +378,10 @@ describe('PrettyConsole', () => {
       [],
       array, str); 
 
-    /** このテストが示唆するものとは！
-     * エラーはオブジェクトとして、第一引数にすべし。それ以外は、配列のまま、第二引数に渡せば良い！
-     */
-
   });
 
   it('If `pretty` is `false` and inject `pino`, the output up to the second argument is logged via `pino`(object,array).', async () => {
     const obj = { x: 124, y: "hello" };
-    const num1 = 123456;
-    const num2 = 0.00099;
-    const str = "This is a string.";
-    const err = Object.assign(new Error("#ERROR#"), { code: "ETEST" });
     const aaa = [1, 2, 3, 4,];
 
     await testOutputString(
@@ -371,11 +392,7 @@ describe('PrettyConsole', () => {
 
   it('If `pretty` is `false` and inject `pino`, the output up to the second argument is logged via `pino`(object,error).', async () => {
     const obj = { x: 124, y: "hello" };
-    const num1 = 123456;
-    const num2 = 0.00099;
-    const str = "This is a string.";
     const err = Object.assign(new Error("#ERROR#"), { code: "ETEST" });
-    const aaa = [1, 2, 3, 4,];
 
     await testOutputString(
       [JSON.stringify(obj).replace('{', '').replace('}', ''), `"msg":${JSON.stringify(err)}`],

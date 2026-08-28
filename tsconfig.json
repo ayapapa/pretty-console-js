@@ -3,14 +3,20 @@
     "target": "ES2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "allowJs": true,
-    "checkJs": true,
     "declaration": true,
     "emitDeclarationOnly": true,
     "rootDir": "./src",
     "outDir": "./dist",
     "types": ["node"],
     "allowImportingTsExtensions": true,
+
+    "strict": true,
+    "noImplicitReturns": true, 
+    "noFallthroughCasesInSwitch": true, 
+    "forceConsistentCasingInFileNames": true, 
+    "noUnusedLocals": true, 
+    "noUnusedParameters": true, 
+    "exactOptionalPropertyTypes": true,
   },
   "include": [
     "src/**/*"
