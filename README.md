@@ -59,7 +59,7 @@ To address this, I added functionality to integrate with a standard file logger.
 * Optional timestamps.
 * Optional colored output.
 * Configurable formatting options.
-* Optional a console-compatible external logger injection. 
+* Optional console-compatible external logger injection. 
 * Optional callback function to receive arguments to be passed console. It is convenient to integrate with a file logger.
 
 **As a result, console logs can be made more readable by humans, file logs can be made more readable by machines, and so on.**
@@ -100,22 +100,22 @@ Configuration Options for util.inspect() that are not described here.
 For more information, see the description of 
 [`util.inspect()` Configuration Options](https://nodejs.org/api/util.html#utilinspectobject-options).
 
-| Option        | Type      | Description   | Default          |
+| Option        | Type      | Default       | Description      |
 | ------------- | --------- | ------------- | ---------------- |
-| `level`       | `string` | The minimum log level to display. Valid values: `'trace'`, `'debug'`, `'info'`, `'warn'`, `'error'`, `'fatal'`, and `'silent'`. Order: `'trace'` < `'debug'` < `'info'` < `'warn'` < `'error'` < `'fatal'` < `'silent'`> | `'info'`      |
-| `timestamp`   | `boolean` | If `true`, includes a timestamp in the output. | `true` |
-| `levelName`   | `boolean` | If `true`, includes the log level name (e.g., TRACE, DEBUG). | `true` |
-| `callStack`   | `boolean` | If `true`, includes the call stack for `trace`-level logs. | `false` |
-| `provider`    | `LogProvider` | Specifies alternative to `console`. | `console` |
-| `pretty`      | `boolean` | If `true`, uses PrettyConsole's `pretty` output.          | `true` |
-| `onLog`       | `(logEntry: LogEntry) => void` | A callback function that receives each log call before level filtering and formatting. | `undefined` |
-| `breakLength` | `number`  | The length at which input values are split across multiple lines. Set to Infinity to format the input as a single line (in combination with compact set to true or any number >= 1). | `120` |
-| `colors`      | `boolean` | If `true`, the output is styled with ANSI color codes. Colors are customizable. See [Customizing util.inspect colors](https://nodejs.org/api/util.html#customizing-utilinspect-colors). | `true` |
-| `compact`     | `boolean` or `number` | If `false`, each object key is displayed on a new line, and text longer than `breakLength` is broken. If a number is specified, up to `n` inner elements are combined on a single line if they fit within `breakLength`. Short array elements are also grouped. | `false` |
-| `depth` | `number` or `null` | Sets the maximum recursion depth for nested objects. Use `null` to inspect all levels. | `null` |
-| `maxArrayLength` | `number` or `null` | Sets the maximum number of Array, TypedArray, Map, WeakMap, and WeakSet elements to include. Use `null` or `Infinity` to show all elements. Use `0` or a negative number to show no elements. | `100` |
-| `maxStringLength` | `number` or `null` | Sets the maximum number of characters to include when formatting. Use `null` or `Infinity` to show all characters. Use `0` or a negative number to show no characters. | `12800` |
-| `sorted`      | `boolean` or `function` | If `true` or a function, all properties of an object, and Set and Map entries are sorted in the resulting string. If `true`, the [default sort](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort) is used. If a function is provided, it is used as a [compare function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#parameters). | `true` |
+| `level`       | `string` | `'info'`      | The minimum log level to display. Valid values: `'trace'`, `'debug'`, `'info'`, `'warn'`, `'error'`, `'fatal'`, and `'silent'`. Order: `'trace'` < `'debug'` < `'info'` < `'warn'` < `'error'` < `'fatal'` < `'silent'` |
+| `timestamp`   | `boolean` | `true` | If `true`, includes a timestamp in the output. |
+| `levelName`   | `boolean` | `true` | If `true`, includes the log level name (e.g., TRACE, DEBUG). |
+| `callStack`   | `boolean` | `false` | If `true`, includes the call stack for `trace`-level logs. This is an option for `console.trace()` compatibility; therefore, it applies only to logs at the `trace` level. |
+| `provider`    | `LogProvider` | `console` | Specifies alternative to `console`. |
+| `pretty`      | `boolean` | `true` | If `true`, uses PrettyConsole's `pretty` output.          |
+| `onLog`       | `(logEntry: LogEntry) => void` | `undefined` | A callback function that receives each log call before level filtering and formatting. |
+| `breakLength` | `number`  | `120` | The length at which input values are split across multiple lines. Set to Infinity to format the input as a single line (in combination with compact set to true or any number >= 1). |
+| `colors`      | `boolean` | `true` | If `true`, the output is styled with ANSI color codes. Colors are customizable. See [Customizing util.inspect colors](https://nodejs.org/api/util.html#customizing-utilinspect-colors). |
+| `compact`     | `boolean` or `number` | `false` | If `false`, each object key is displayed on a new line, and text longer than `breakLength` is broken. If a number is specified, up to `n` inner elements are combined on a single line if they fit within `breakLength`. Short array elements are also grouped. |
+| `depth` | `number` or `null` | `null` | Sets the maximum recursion depth for nested objects. Use `null` to inspect all levels. |
+| `maxArrayLength` | `number` or `null` | `100` | Sets the maximum number of Array, TypedArray, Map, WeakMap, and WeakSet elements to include. Use `null` or `Infinity` to show all elements. Use `0` or a negative number to show no elements. |
+| `maxStringLength` | `number` or `null` | `12800` | Sets the maximum number of characters to include when formatting. Use `null` or `Infinity` to show all characters. Use `0` or a negative number to show no characters. |
+| `sorted`      | `boolean` or `function` | `true` | If `true` or a function, all properties of an object, and Set and Map entries are sorted in the resulting string. If `true`, the [default sort](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort) is used. If a function is provided, it is used as a [compare function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#parameters). |
 
 ### `onLog` callback
 
@@ -189,17 +189,18 @@ Execution results:<br>
 
 | File        | Type      | Description        | 
 | ----------- | --------- | ------------------ |
-| [sample\pretty1.cjs](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/sample/pretty1.cjs) | CommonJS   | Simple example |
-| [sample\pretty1.ts](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/sample/pretty1.ts)  | TypeScript | Simple example |
-| [sample\pino-integration1.cjs](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/sample/pino-integration1.cjs) | CommonJS   | An example of injecting and using `pino`. |
-| [sample\pino-integration1.ts](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/sample/pino-integration1.ts)  | TypeScript | An example of injecting and using `pino`. |
-| [sample\pino-integration2.cjs](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/sample/pino-integration2.cjs) | CommonJS   | An example of receiving log output information via the `onLog` callback and outputting it using `pino`. |
-| [sample\pino-integration2.ts](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/sample/pino-integration2.ts)  | TypeScript | An example of receiving log output information via the `onLog` callback and outputting it using `pino`. |
-| [sample\pino-integration3.cjs](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/sample/pino-integration3.cjs) | CommonJS   | An example of outputting to the console using `PrettyConsole` while simultaneously outputting to a file using `pino`. |
-| [sample\pino-integration3.ts](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/sample/pino-integration3.ts)  | TypeScript | An example of outputting to the console using `PrettyConsole` while simultaneously outputting to a file using `pino`. |
-| [sample\winston-integration1.cjs](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/sample/winston-integration1.cjs) | CommonJS   | An example of injecting and using `winston`. |
-| [sample\winston-integration1.ts](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/sample/winston-integration1.ts)  | TypeScript | An example of injecting and using `winston`. |
-| [sample\winston-integration2.cjs](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/sample/winston-integration2.cjs) | CommonJS   | An example of receiving log output information via the `onLog` callback and outputting it using `winston`. |
-| [sample\winston-integration2.ts](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/sample/winston-integration2.ts)  | TypeScript | An example of receiving log output information via the `onLog` callback and outputting it using `winston`. |
-| [sample\winston-integration3.cjs](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/sample/winston-integration3.cjs) | CommonJS   | An example of outputting to the console using `PrettyConsole` while simultaneously outputting to a file using `winston`. |
-| [sample\winston-integration3.ts](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/sample/winston-integration3.ts)  | TypeScript | An example of outputting to the console using `PrettyConsole` while simultaneously outputting to a file using `winston`. |
+| [example/pretty1.cjs](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/example/pretty1.cjs) | CommonJS   | A simple example |
+| [example/pretty1.ts](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/example/pretty1.ts)  | TypeScript | A simple example |
+| [example/logger-injection.ts](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/example/logger-injection.ts) | TypeScript   | An example of type-safe external logger injection.  |
+| [example/pino-integration1.cjs](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/example/pino-integration1.cjs) | CommonJS   | An example of receiving log output information via the `onLog` callback and outputting it using `pino`. |
+| [example/pino-integration1.ts](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/example/pino-integration1.ts)  | TypeScript | An example of receiving log output information via the `onLog` callback and outputting it using `pino`. |
+| [example/pino-integration2.cjs](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/example/pino-integration2.cjs) | CommonJS   | An example showing how to receive log output information via the `onLog` callback and include `Error` instance details in the log when outputting using `pino`. |
+| [example/pino-integration2.ts](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/example/pino-integration2.ts)  | TypeScript | An example showing how to receive log output information via the `onLog` callback and include `Error` instance details in the log when outputting using `pino`. |
+| [example/pino-integration3.cjs](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/example/pino-integration3.cjs) | CommonJS   | An example of outputting to the console using `PrettyConsole` while simultaneously outputting to a file using `pino`. |
+| [example/pino-integration3.ts](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/example/pino-integration3.ts)  | TypeScript | An example of outputting to the console using `PrettyConsole` while simultaneously outputting to a file using `pino`. |
+| [example/winston-integration1.cjs](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/example/winston-integration1.cjs) | CommonJS   | An example of receiving log output information via the `onLog` callback and outputting it using `winston`. |
+| [example/winston-integration1.ts](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/example/winston-integration1.ts)  | TypeScript | An example of receiving log output information via the `onLog` callback and outputting it using `winston`. |
+| [example/winston-integration2.cjs](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/example/winston-integration2.cjs) | CommonJS   | An example showing how to receive log output information via the `onLog` callback and include `Error` instance details in the log when outputting using `winston`. |
+| [example/winston-integration2.ts](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/example/winston-integration2.ts)  | TypeScript | An example showing how to receive log output information via the `onLog` callback and include `Error` instance details in the log when outputting using `winston`. |
+| [example/winston-integration3.cjs](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/example/winston-integration3.cjs) | CommonJS   | An example of outputting to the console using `PrettyConsole` while simultaneously outputting to a file using `winston`. |
+| [example/winston-integration3.ts](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/example/winston-integration3.ts)  | TypeScript | An example of outputting to the console using `PrettyConsole` while simultaneously outputting to a file using `winston`. |

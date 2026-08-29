@@ -113,7 +113,8 @@ describe('PrettyConsole', () => {
     Object.assign(conf, testConf);
     expect(equalConfigs(logger.getDefaultConfig(), logger.getConfig())).toBe(true);
   });
-/*
+
+  /*
   function copyProp<K extends keyof Config>(
     target: Config,
     source: Config,
@@ -122,6 +123,7 @@ describe('PrettyConsole', () => {
     target[key] = source[key];
   }
   */
+
   it('Only the keys specified in `setConfig()` are modified.', () => {
     const logger = new PrettyConsole();
     const testConf: Config = {
@@ -236,6 +238,22 @@ describe('PrettyConsole', () => {
 
   it('Output a silent log using `log()`.', () => {
     testOutputContents('silent', 'silent test', {}, `log`);
+  });
+
+  it('should still trigger onLog callback even when level is silent', () => {
+    const onLogMock = vi.fn();
+    const logger = new PrettyConsole({
+      level: 'silent',
+      onLog: onLogMock
+    });
+
+    // Verify whether onLog triggers when the method is called, even in `silent` mode.
+    logger.info('This is an info message');
+
+    expect(onLogMock).toHaveBeenCalledTimes(1);
+    const entry = onLogMock.mock.calls[0][0];
+    expect(entry.method).toBe('info');
+    expect(entry.args).toContain('This is an info message');
   });
 
   const checkInvalidProperty = (key: ConfigKey , values: any[]) => {
@@ -444,4 +462,23 @@ describe('PrettyConsole', () => {
   it('By setting a callback function in `Config`, you can obtain the appropriate `LogEntry`(fatal).', () => {
     testCallback('fatal');
   })
+
+  it('should strip internal library frames from the stack trace', () => {
+    let capturedLog = '';
+    const logger = new PrettyConsole({
+      callStack: true,
+      onLog: (entry) => {
+        // Get the output stack (or formatted string)
+        capturedLog = entry.args.join(' '); 
+      }
+    });
+
+    logger.trace('Error occurred');
+
+    // Verify that the stack trace does not contain internal library filenames.
+    expect(capturedLog).not.toContain('PrettyConsole.ts');
+    // Conversely, verify that the information from this test file (user side) is included.
+    expect(capturedLog).toContain('PrettyConsole.test.ts'); 
+  });
+
 });

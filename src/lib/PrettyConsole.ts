@@ -57,6 +57,7 @@ export interface Config {
    *  - 'fatal':  Output logs only for the 'fatal' level.
    *  - 'silent': No output logs.
    * If omitted, defaults to `'info'`.
+   * @default 'info'
    */
   level?: LogLevel;
 
@@ -64,6 +65,7 @@ export interface Config {
    * Whether to output timestamps. 
    * If set to `true`, the timestamp is output.
    * If omitted, defaults to `true`.
+   * @default true
    */
   timestamp?: boolean;
 
@@ -74,29 +76,36 @@ export interface Config {
    * the corresponding `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, and `FATAL` is output.
    * Since `log()` is level-agnostic, the `Level Name` is not output when `log()` is used.
    * If omitted, defaults to `true`.
+   * @default true
    */
   levelName?: boolean
 
   /**
    * Whether to output the call stack in `trace()`. 
    * If set to `true`, the call stack is added to `trace`-level logs. 
+   * Note: This applies only to `trace`-level logs.
    * If omitted, defaults to `false`.
+   * @default false
    */
   callStack?: boolean;
 
   /**
    * Alternative to `console`.
    * If omitted, `console` is used.
+   * @default console
    */
   provider?: LogProvider;
 
   /**
    * Whether or not to use PrettyConsole's `pretty` output.
+   * If omitted, `pretty` is `true`.
+   * @default true
    */
   pretty?: boolean;
 
   /**
    * A callback function that receives each log call before level filtering and formatting.
+   * @default undefined
    */
   onLog?: (logEntry: LogEntry) => void;
 
@@ -105,6 +114,7 @@ export interface Config {
    * Set to Infinity to format the input as a single line
    * (in combination with compact set to true or any number >= 1).
    * If omitted, default to `120`.
+   * @default 120
    */
   breakLength?: number;
 
@@ -113,6 +123,7 @@ export interface Config {
    * If set to `true`, the output is styled with ANSI color codes.
    * Colors are customizable. See {@link https://nodejs.org/api/util.html#customizing-utilinspect-colors Customizing util.inspect colors}. 
    * If omitted, default to `true`.
+   * @default true
    */
   colors?: boolean;
 
@@ -124,6 +135,7 @@ export interface Config {
    * as long as all properties fit into breakLength.
    * Short array elements are also grouped together.
    * If omitted, default to `false`.
+   * @default false
    */
   compact?: boolean | number;
 
@@ -131,6 +143,7 @@ export interface Config {
    * Specifies the maximum recursion depth for nested objects.
    * Use null to inspect all levels recursively.
    * If omitted, default to `null`.
+   * @default null
    */
   depth?: number | null;
 
@@ -141,6 +154,7 @@ export interface Config {
    * For more information, see the description of
    * {@link https://nodejs.org/api/util.html#utilinspectobject-options util.inspect() Configuration Options}.
    * If omitted, default to `100`.
+   * @default 100
    */
   maxArrayLength?: number | null;
 
@@ -149,6 +163,7 @@ export interface Config {
    * Set to null or Infinity to show all elements.
    * Set to 0 or negative to show no characters.
    * If omitted, default to `12800`.
+   * @default 12800
    */
   maxStringLength?: number | null;
 
@@ -159,6 +174,7 @@ export interface Config {
    * is used. If set to a function, it is used as a
    * {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#parameters compare function}.
    * If omitted, default to `true`.
+   * @default true
    */
   sorted?: boolean | CompareFn;
 };
@@ -200,11 +216,11 @@ export class PrettyConsole {
    * Static fields
    */
   /** Default logging level */
-  private static readonly defaultLevel: LogLevel = 'info';
+  static readonly #defaultLevel: LogLevel = 'info';
 
   /** Default configuration */
-  private static readonly defaultConf: Config  = {
-    level:            PrettyConsole.defaultLevel,
+  static readonly #defaultConf: Config  = {
+    level:            PrettyConsole.#defaultLevel,
     timestamp:        true,
     levelName:        true,
     callStack:        false,
@@ -228,7 +244,7 @@ export class PrettyConsole {
    * @returns Default configuration.
    */
   public static getDefaultConfig(): Config {
-    return {...PrettyConsole.defaultConf};
+    return {...PrettyConsole.#defaultConf};
   }
 
   /** 
@@ -236,7 +252,7 @@ export class PrettyConsole {
    */
 
   /** Current configuration */
-  #config: Config = { ...PrettyConsole.defaultConf };
+  #config: Config = { ...PrettyConsole.#defaultConf };
 
   /** Logger. */
   #logger: LogProvider = console;
@@ -248,9 +264,9 @@ export class PrettyConsole {
 
   /**
    * @param config
-   * @default `PrettyConsole.defaultConf`
+   * @default `PrettyConsole.#defaultConf`
    */
-  constructor(config: Config = PrettyConsole.defaultConf) {
+  constructor(config: Config = PrettyConsole.#defaultConf) {
     this.setConfig(config);
   }
 
@@ -275,7 +291,7 @@ export class PrettyConsole {
    * Reset current configuration
    */
   public resetConfig(): void {
-    this.setConfig(PrettyConsole.defaultConf);
+    this.setConfig(PrettyConsole.#defaultConf);
   }
 
   /**
@@ -355,7 +371,7 @@ export class PrettyConsole {
    * @returns true if `method` is enabled by the current log level, and false otherwise.
    */
   #shouldLog(method: LogMethod): boolean {
-    return logLevels[method as LogLevel] >= logLevels[this.#config.level ?? PrettyConsole.defaultLevel];
+    return logLevels[method as LogLevel] >= logLevels[this.#config.level ?? PrettyConsole.#defaultLevel];
   }
 
   /**
@@ -363,7 +379,7 @@ export class PrettyConsole {
    */
   #resolveLogger(provider: LogProvider | undefined): LogProvider {
     if (provider === undefined || provider === console) {
-      const logger = {...console as LogProvider};
+      const logger = Object.create(console);
       // Replace `console.trace()` with `debug()` because its default behavior prints a stack trace.
       logger.trace = logger.debug;
       return logger;
@@ -388,25 +404,31 @@ export class PrettyConsole {
       }
     }
 
-    // Check type
-    checkType('level',          (v) => typeof v === 'string' && Object.hasOwn(logLevels, v));
-    checkType('timestamp',      (v) => typeof v === 'boolean');
-    checkType('levelName',      (v) => typeof v === 'boolean');
-    checkType('callStack',      (v) => typeof v === 'boolean');
-    checkType('provider',       
-      (v) => {
+    const validator: Record<keyof Config, (v: any) => boolean> = {
+      level:          (v) => typeof v === 'string' && Object.hasOwn(logLevels, v),
+      timestamp:      (v) => typeof v === 'boolean',
+      levelName:      (v) => typeof v === 'boolean',
+      callStack:      (v) => typeof v === 'boolean',
+      provider:       (v) => {
         return v != null  && Boolean(v.log) && Boolean(v.trace) && Boolean(v.debug) &&
           Boolean(v.info)  && Boolean(v.warn)  && Boolean(v.error);
-      }
-    );
-    checkType('pretty',         (v) => typeof v === 'boolean');
-    checkType('breakLength',    (v) => typeof v === 'number' );
-    checkType('colors',         (v) => typeof v === 'boolean');
-    checkType('compact',        (v) => typeof v === 'boolean' || typeof v === 'number');
-    checkType('depth',          (v) => typeof v === 'number'  || v === null);
-    checkType('maxArrayLength', (v) => typeof v === 'number'  || v === null);
-    checkType('maxStringLength',(v) => typeof v === 'number'  || v === null);
-    checkType('sorted',         (v) => typeof v === 'boolean' || typeof v === 'function');
+      },
+      pretty:         (v) => typeof v === 'boolean',
+      onLog:          (v) => typeof v === 'function',
+      breakLength:    (v) => typeof v === 'number' ,
+      colors:         (v) => typeof v === 'boolean',
+      compact:        (v) => typeof v === 'boolean' || typeof v === 'number',
+      depth:          (v) => typeof v === 'number'  || v === null,
+      maxArrayLength: (v) => typeof v === 'number'  || v === null,
+      maxStringLength:(v) => typeof v === 'number'  || v === null,
+      sorted:         (v) => typeof v === 'boolean' || typeof v === 'function',
+    }
+
+    const keys = Object.keys(validator) as Array<keyof Config>;
+    for (const key of keys) {
+      checkType(key, validator[key]);
+    }
+
 
     // Fill options with current values, and return.
     return {...this.getConfig(), ...rConf};

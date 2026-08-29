@@ -1,6 +1,4 @@
 import { PrettyConsole } from '@ayapapa-npm/pretty-console-js';
-// CommonJS:
-// const { PrettyConsole } = require('@ayapapa-npm/pretty-console-js');
 
 // Create instance
 const logger = new PrettyConsole({ level: 'trace', callStack: true });
