@@ -20,21 +20,29 @@
     "node": ">=20"
   },
   "scripts": {
+    "dev": "vite",
     "build": "tsup src/index.ts --format esm,cjs --out-dir dist --clean --dts",
+    "build:vite": "vite build",
     "typecheck": "tsc --noEmit",
+    "preview": "vite preview",
     "test": "vitest run",
     "test:debug": "vitest --inspect-brk --run",
     "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage && start coverage/index.html",
     "check": "npm run typecheck && npm run build && npm run test",
     "release:check": "npm run check",
     "prepublishOnly": "npm run release:check"
   },
   "devDependencies": {
     "@types/node": "^26.2.0",
+    "@vitest/coverage-v8": "^4.1.11",
+    "@vitest/ui": "^4.1.11",
     "pino": "^10.3.1",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
-    "vitest": "^4.1.10",
+    "vite": "^8.2.2",
+    "vitest": "^4.1.11",
     "winston": "^3.19.0"
   },
   "dependencies": {

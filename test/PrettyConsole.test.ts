@@ -114,6 +114,19 @@ describe('PrettyConsole', () => {
     expect(equalConfigs(logger.getDefaultConfig(), logger.getConfig())).toBe(true);
   });
 
+  it('current configurations are invariant', () => {
+    const conf = { provider: null }
+    expect.assertions(1);
+    try {
+      // Forced type assertion for testing.
+      new PrettyConsole(conf as any);
+    }
+    catch (err) {
+      expect(err instanceof TypeError).toBeTruthy();
+    }
+  });
+
+
   /**
    * Copy the isomorphic object elements and then call the callback function. 
    * This function was created out of the need for type safety. 
@@ -175,6 +188,26 @@ describe('PrettyConsole', () => {
     }
   });
 
+  it('Outputting a log at the `fatal` level calls `error()`.', () => {
+    const dummyLogger = {
+      log: vi.fn(),
+      trace: vi.fn(),
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+    };
+
+    const loger = new PrettyConsole({ provider: dummyLogger });
+    const msg = "Fatal!";
+    loger.fatal(msg);
+
+    const args = dummyLogger.error.mock.calls[0];
+    expect(args[1]).toContain('FATAL:');
+    expect(args[2]).toContain(msg);
+  });
+
+
   const levelToProviderKey: Record<LogLevel, ProviderKey> = {
     trace:  'trace',
     debug:  'debug',
@@ -186,7 +219,7 @@ describe('PrettyConsole', () => {
     silent: 'info',
   };
 
-  const createMockProvider = (): Provider => ({
+  const createMockProvider = () => ({
     trace: vi.fn(),
     log: vi.fn(),
     debug: vi.fn(),
@@ -196,13 +229,50 @@ describe('PrettyConsole', () => {
     fatal: vi.fn(),
   });
 
+  it('Output null.', () => {
+    const provider = createMockProvider();
+    const logger = new PrettyConsole({ provider });
+    logger.info(null);
+
+    const args = provider.info.mock.calls[0];
+    expect(args[1]).toContain('INFO:');
+    expect(args[2]).toBe(null);
+  });
+
+  it('Output Error.', () => {
+    const provider = createMockProvider();
+    const logger = new PrettyConsole({ provider });
+    const msg = "#######";
+    const err = new Error(msg);
+    logger.error(err);
+
+    const args = provider.error.mock.calls[0];
+    expect(args[1]).toContain('ERROR:');
+    expect(args[2] instanceof Error).toBeTruthy();
+    expect(args[2].message).toContain(msg);
+    expect(args[2].stack).toContain('PrettyConsole.test.ts');
+  });
+
+  it('Output object.', () => {
+    const provider = createMockProvider();
+    const logger = new PrettyConsole({ provider, level: 'trace' });
+    const obj = { hoge: "#######" };
+
+    logger.trace(obj);
+
+    const args = provider.trace.mock.calls[0];
+    expect(args[1]).toContain('TRACE:');
+    expect(args[2]).toBeTypeOf('string');
+    expect(args[2]).toContain('hoge');
+    expect(args[2]).toContain(obj.hoge);
+  });
+
   const testOutputContents = (
     level: LogLevel,
     msg: string,
     addConf: { callStack?: boolean } = {},
-    method: string = ''
+    method: string = '',
   ): void => {
-
     const provider: Provider = createMockProvider();
     const logger = new PrettyConsole({ level, provider, ...addConf });
     const realKey = levelToProviderKey[level];
@@ -215,6 +285,9 @@ describe('PrettyConsole', () => {
     if (level === 'silent') {
       expect(args).toBeUndefined();
     }
+    else if (level === 'log') {
+      expect(args[1]).toContain(msg);
+    }
     else {
       expect(args[1]).toContain(level.toUpperCase() + ':');
       expect(args[2]).toContain(msg);
@@ -223,6 +296,10 @@ describe('PrettyConsole', () => {
       }
     }
   };
+
+  it('Output a log log.', () => {
+    testOutputContents('log', 'log test');
+  });
 
   it('Output a trace log.', () => {
     testOutputContents('trace', 'trace test', {callStack: true});

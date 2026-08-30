@@ -313,7 +313,7 @@ export class PrettyConsole {
    * @param args  An array of values ​​to be output.
    */
   public log(...args: unknown[]) {
-    this.#output('log', args, (...a) => (this.#logger.log ?? this.#logger.info)(...a));
+    this.#output('log', args, (...a) => this.#logger.log(...a));
   }
 
   /**
@@ -519,10 +519,10 @@ export class PrettyConsole {
     return Boolean(this.#config.pretty) === false ? 
       args : 
       args.map((value: unknown) => {
-      if (value instanceof Error) {
+      if (value == null || value instanceof Error) {
         return value;
       }
-      if (typeof value === "object" && value !== null) {
+      if (typeof value === "object") {
         return util.inspect(value, this.#config);
       }
       return value;
