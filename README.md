@@ -1,5 +1,9 @@
 [![CI](https://github.com/ayapapa/pretty-console/actions/workflows/ci.yml/badge.svg)](https://github.com/ayapapa/pretty-console/actions/workflows/ci.yml)
 ![Coverage](./badges/coverage-total.svg)
+![Branches](./badges/coverage-branches.svg)
+![Functions](./badges/coverage-functions.svg)
+![Lines](./badges/coverage-lines.svg)
+![Statements](./badges/coverage-statements.svg)
 
 # pretty-console-js
 
