@@ -114,48 +114,64 @@ describe('PrettyConsole', () => {
     expect(equalConfigs(logger.getDefaultConfig(), logger.getConfig())).toBe(true);
   });
 
-  /*
-  function copyProp<K extends keyof Config>(
-    target: Config,
-    source: Config,
-    key: K,
-  ): void {
-    target[key] = source[key];
+  /**
+   * Copy the isomorphic object elements and then call the callback function. 
+   * This function was created out of the need for type safety. 
+   * This was introduced as a countermeasure because copying elements of the same type and key in a for statement would result in a type error.
+   */
+  function copyEach<T extends object, K extends keyof T>(target: T, source: T, cb: () => void) {
+    const keys = Object.keys(source) as Array<K>;
+    for (const key of keys) {
+      target[key] = source[key];
+      cb();
+    }
   }
-  */
-
+  
   it('Only the keys specified in `setConfig()` are modified.', () => {
     const logger = new PrettyConsole();
-    const testConf: Config = {
-      level: "silent",
-      timestamp: false,
-      levelName: false,
-      callStack: true,
-      provider: createProvider(),
-      pretty: false,
-      breakLength: 99,
-      colors: false,
-      compact: true,
-      depth: 3,
-      maxArrayLength: 80,
-      maxStringLength: 10000,
-      sorted: false,
-    };
+    const testConfs: Config[] = [
+      {
+        level: "silent",
+        timestamp: false,
+        levelName: false,
+        callStack: true,
+        provider: createProvider(),
+        pretty: false,
+        breakLength: 99,
+        colors: false,
+        compact: true,
+        depth: 3,
+        maxArrayLength: 80,
+        maxStringLength: 10000,
+        sorted: false,
+      },
+      {
+        level: "trace",
+        timestamp: true,
+        levelName: true,
+        callStack: false,
+        provider: createProvider(),
+        pretty: true,
+        breakLength: 101,
+        colors: true,
+        compact: false,
+        depth: 4,
+        maxArrayLength: 99,
+        maxStringLength: 10001,
+        sorted: true,
+      },
+    ];
     const keys = Object.keys(testConf) as Array<keyof Config>;
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < testConfs.length; i++) {
       const conf = logger.getConfig();
       const newConf: Config = {};
-      for (const key of keys) {
-        // Simply copy the same value from the same key in the Config.
-        // TS cannot select the key/value correlation here.
-        newConf[key] = testConf[key] as any;
 
+      copyEach(newConf, testConfs[i], () => {
         logger.setConfig(newConf);
-
         const curConf = logger.getConfig();
         const expConf = { ...conf, ...newConf };
         expect(equalConfigs(curConf, expConf)).toBeTruthy();;
-      }
+      });
     }
   });
 
@@ -178,14 +194,14 @@ describe('PrettyConsole', () => {
     warn: vi.fn(),
     error: vi.fn(),
     fatal: vi.fn(),
-    test: true,
-  }) as any;
+  });
 
   const testOutputContents = (
     level: LogLevel,
     msg: string,
     addConf: { callStack?: boolean } = {},
-    method: string = ''): void => {
+    method: string = ''
+  ): void => {
 
     const provider: Provider = createProvider();
     const logger = new PrettyConsole({ level, provider, ...addConf });

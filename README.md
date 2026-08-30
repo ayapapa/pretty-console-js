@@ -1,6 +1,11 @@
 [![CI](https://github.com/ayapapa/pretty-console/actions/workflows/ci.yml/badge.svg)](https://github.com/ayapapa/pretty-console/actions/workflows/ci.yml)
+
 # pretty-console-js
 
+## Table of contents
+[Overview](#overview) | [Why?](#why) | [Features](#features) | [Installation](#installation) | [List of APIs](#list-of-apis) | [Configurations](#configurations) | [Node.js Support](#nodejs-support) | [Usage](#usage) | [Examples](#examples)
+
+## Overview
 A tiny wrapper around the standard Node.js `console`.
 
 PrettyConsole is a small utility that makes console log output a little more readable.<br>
@@ -28,11 +33,11 @@ With `PrettyConsole.info()`, you can get output like this:
 ```
 **You can specify settings such as sorting by key, object expansion, adding timestamps, and assigning log levels.**
 
-It is possible to inject a `console` compatible external logger (see `Config`).<br>
-You can also pass each log's arguments to `console` incompatible loggers (see `Config`).<br>
-If you are using a logger that is not compatible with the console, the generated string may require a little extra work when passed to the logging API** (see example).
+It is possible to inject a `console` compatible external logger (see [`Config`](#configurations)).<br>
+You can also pass each log's arguments to `console` incompatible loggers (see [`Config`](#configurations)).<br>
+If you are using a logger that is not compatible with the console, the generated string may require a little extra work when passed to the logging API** (see [Examples](#examples)).
 
-** **Examples of integration with `pino` and `winston` will be described later.**
+** Examples of integration with `pino` and `winston` will be described later(see [Examples](#examples)).
 
 
 **As a result, console logs can be made more readable by humans, file logs can be made more readable by machines, and so on.**
@@ -49,7 +54,7 @@ It keeps the familiar `console` API while adding a few small conveniences for ev
 Furthermore, as debugging tasks grew more complex—involving elements such as file I/O, 
 mutual exclusion, and asynchronous processing—I keenly felt the need for a logger capable of writing to files.
 
-To address this, I added functionality to integrate with a standard file logger.
+To address this, I also added functionality to integrate with a standard file logger.
 
 ## Features
 
@@ -185,7 +190,7 @@ main();
 Execution results:<br>
 ![Execution results](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/images/usage1.png)
 
-## Sample
+## Examples
 
 | File        | Type      | Description        | 
 | ----------- | --------- | ------------------ |
