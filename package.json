@@ -30,7 +30,6 @@
     "prepublishOnly": "npm run release:check"
   },
   "devDependencies": {
-    "@ayapapa-npm/pretty-console-js": "^0.1.5",
     "@types/node": "^26.2.0",
     "pino": "^10.3.1",
     "tsup": "^8.5.1",
