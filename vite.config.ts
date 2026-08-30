@@ -19,7 +19,7 @@ export default defineConfig({
     
     // カバレッジ計測の設定
     coverage: {
-      reporter: ['text', 'text-summary', 'json', 'html'],
+      reporter: ['text', 'text-summary', 'json-summary', 'json', 'html'],
       include: ['src/**/*.{ts,tsx,js,jsx}'],
     },
     
