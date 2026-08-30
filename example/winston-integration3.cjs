@@ -43,7 +43,7 @@ function main() {
     throw Object.assign(new Error('Some error!'), { code: 'ESOMEERR' });
   }
   catch (err) {
-    pretty.error("Error occured.", err);
+    pretty.error("Error occurred.", err);
   }
 }
 

@@ -40,7 +40,7 @@ function main() {
     throw Object.assign(new Error('Some error!'), { code: 'ESOMEERR' });
   }
   catch (err) {
-    pretty.error("Error occured.", err);
+    pretty.error("Error occurred.", err);
   }
   // Output example.
   // {"code":"ESOMEERR","level":"error","message":"Extracted from PrettyConsole: Some error!","stack":(The rest is omitted...)

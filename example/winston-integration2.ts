@@ -42,7 +42,7 @@ function main() {
     throw Object.assign(new Error('Some error!'), { code: 'ESOMEERR' });
   }
   catch (err) {
-    pretty.error("Error occured.", err);
+    pretty.error("Error occurred.", err);
   }
   // Output example.
   // {"code":"ESOMEERR","level":"error","message":"Extracted from PrettyConsole: Some error!","stack":"Error: Some error!\n    at main (file:///D:/dev/pretty-console-js/sample/winston-integration2.ts:42:25)\n    at file:///D:/dev/pretty-console-js/sample/winston-integration2.ts:51:1\n    at ModuleJob.run (node:internal/modules/esm/module_job:437:25)\n    at async node:internal/modules/esm/loader:639:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)"}

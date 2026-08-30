@@ -135,7 +135,7 @@ describe('PrettyConsole', () => {
         timestamp: false,
         levelName: false,
         callStack: true,
-        provider: createProvider(),
+        provider: createMockProvider(),
         pretty: false,
         breakLength: 99,
         colors: false,
@@ -150,7 +150,7 @@ describe('PrettyConsole', () => {
         timestamp: true,
         levelName: true,
         callStack: false,
-        provider: createProvider(),
+        provider: createMockProvider(),
         pretty: true,
         breakLength: 101,
         colors: true,
@@ -186,7 +186,7 @@ describe('PrettyConsole', () => {
     silent: 'info',
   };
 
-  const createProvider = (): Provider => ({
+  const createMockProvider = (): Provider => ({
     trace: vi.fn(),
     log: vi.fn(),
     debug: vi.fn(),
@@ -203,7 +203,7 @@ describe('PrettyConsole', () => {
     method: string = ''
   ): void => {
 
-    const provider: Provider = createProvider();
+    const provider: Provider = createMockProvider();
     const logger = new PrettyConsole({ level, provider, ...addConf });
     const realKey = levelToProviderKey[level];
 
@@ -496,5 +496,82 @@ describe('PrettyConsole', () => {
     // Conversely, verify that the information from this test file (user side) is included.
     expect(capturedLog).toContain('PrettyConsole.test.ts'); 
   });
+
+  it('should reflect modifications to LogEntry.args made by onLog', () => {
+    const provider = createMockProvider();
+
+    const pc = new PrettyConsole({
+      provider,
+      onLog: (entry) => {
+        entry.args[0] = 'modified';
+      },
+    });
+
+    pc.info('original');
+
+    expect(provider.info).toHaveBeenCalledWith(
+      expect.any(String),
+      'INFO:',
+      'modified',
+    );
+  });
+
+it('should reflect additions to LogEntry.args made by onLog', () => {
+  const provider = createMockProvider();
+
+  const pc = new PrettyConsole({
+    provider,
+    onLog: (entry) => {
+      entry.args.push('added');
+    },
+  });
+
+  pc.info('original');
+
+  expect(provider.info).toHaveBeenCalledWith(
+    expect.any(String),
+    'INFO:',
+    'original',
+    'added',
+  );
+});
+
+it('should reflect modifications to LogEntry.args made by onLog', () => {
+  const provider = createMockProvider();
+
+  const pc = new PrettyConsole({
+    provider,
+    onLog: (entry) => {
+      entry.args[0] = 'modified';
+    },
+  });
+
+  pc.info('original');
+
+  expect(provider.info).toHaveBeenCalledWith(
+    expect.any(String),
+    'INFO:',
+    'modified',
+  );
+});
+
+it('should reflect replacement of LogEntry.args made by onLog', () => {
+  const provider = createMockProvider();
+
+  const pc = new PrettyConsole({
+    provider,
+    onLog: (entry) => {
+      entry.args = ['replaced'];
+    },
+  });
+
+  pc.info('original');
+
+  expect(provider.info).toHaveBeenCalledWith(
+    expect.any(String),
+    'INFO:',
+    'replaced',
+  );
+});
 
 });

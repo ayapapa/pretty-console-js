@@ -16,7 +16,7 @@ function someFunc(x: number, y: number, z: number) {
     throw new Error("Error!!");
   }
   catch (err) {
-    logger.error("Error occuered.", err);
+    logger.error("Error occurred.", err);
   }
 
   return result;

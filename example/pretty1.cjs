@@ -19,8 +19,8 @@ function someFunc(x, y, z) {
     throw new Error("Error!!");
   }
   catch (err) {
-    logger.error("Error occuered.", err);
-    console.error("Error occuered.", err);
+    logger.error("Error occurred.", err);
+    console.error("Error occurred.", err);
   }
 
   return result;

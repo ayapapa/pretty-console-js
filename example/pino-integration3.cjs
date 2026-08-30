@@ -35,7 +35,7 @@ function main() {
     throw e;
   }
   catch (err) {
-    pretty.error("Error occured.", err);
+    pretty.error("Error occurred.", err);
   }
 }
 

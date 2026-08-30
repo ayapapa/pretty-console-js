@@ -33,11 +33,11 @@ With `PrettyConsole.info()`, you can get output like this:
 ```
 **You can specify settings such as sorting by key, object expansion, adding timestamps, and assigning log levels.**
 
-It is possible to inject a `console` compatible external logger (see [`Config`](#configurations)).<br>
-You can also pass each log's arguments to `console` incompatible loggers (see [`Config`](#configurations)).<br>
-If you are using a logger that is not compatible with the console, the generated string may require a little extra work when passed to the logging API** (see [Examples](#examples)).
+A logger that is compatible with the console API can be injected directly. 
 
-** Examples of integration with `pino` and `winston` will be described later(see [Examples](#examples)).
+Loggers that are not compatible with the console API can also be integrated with some adaptation. For more flexible integration, use the onLog callback to receive each log entry and forward it to your logger as needed.
+
+Examples of these integration approaches are available in the [Examples](#examples) section. See [`Config`](#configurations) for configuration details.
 
 
 **As a result, console logs can be made more readable by humans, file logs can be made more readable by machines, and so on.**
@@ -81,7 +81,7 @@ npm install @ayapapa-npm/pretty-console-js
 
 ## List of APIs
 ```
-Pretty Console
+PrettyConsole
 ├── log():              Outputs if level specified other than `silent`.
 ├── trace():            Outputs `trace` level log.
 ├── debug():            Outputs `debug` level log.
@@ -89,7 +89,7 @@ Pretty Console
 ├── warn():             Outputs `warn` level log.
 ├── error():            Outputs `error` level log.
 ├── fatal():            Outputs `fatal` level log.
-├── setConfig():        Specify `Config` (overwrite the current settings).
+├── setConfig():        Update the current configuration with the specified options.
 ├── getConfig():        Get the current settings.
 ├── resetConfig():      Reset settings (return to default settings).
 └── getDefaultConfig(): Get the default settings.
@@ -113,7 +113,7 @@ For more information, see the description of
 | `callStack`   | `boolean` | `false` | If `true`, includes the call stack for `trace`-level logs. This is an option for `console.trace()` compatibility; therefore, it applies only to logs at the `trace` level. |
 | `provider`    | `LogProvider` | `console` | Specifies alternative to `console`. |
 | `pretty`      | `boolean` | `true` | If `true`, uses PrettyConsole's `pretty` output.          |
-| `onLog`       | `(logEntry: LogEntry) => void` | `undefined` | A callback function that receives each log call before level filtering and formatting. |
+| `onLog`       | `(logEntry: LogEntry) => void` | `undefined` | A callback function that receives each log call before level filtering and formatting. The callback may modify LogEntry.args, and any changes are reflected in subsequent PrettyConsole processing. |
 | `breakLength` | `number`  | `120` | The length at which input values are split across multiple lines. Set to Infinity to format the input as a single line (in combination with compact set to true or any number >= 1). |
 | `colors`      | `boolean` | `true` | If `true`, the output is styled with ANSI color codes. Colors are customizable. See [Customizing util.inspect colors](https://nodejs.org/api/util.html#customizing-utilinspect-colors). |
 | `compact`     | `boolean` or `number` | `false` | If `false`, each object key is displayed on a new line, and text longer than `breakLength` is broken. If a number is specified, up to `n` inner elements are combined on a single line if they fit within `breakLength`. Short array elements are also grouped. |
@@ -174,7 +174,7 @@ function someFunc(x, y, z) {
     throw new Error("Error!!");
   }
   catch (err) {
-    logger.error("Error occuered.", err);
+    logger.error("Error occurred.", err);
   }
 
   return result;

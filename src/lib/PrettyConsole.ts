@@ -28,12 +28,17 @@ export type LogMethod = keyof LogProvider;
 /** LogEntry type */
 export interface LogEntry {
   /** Log output time. */
-  timestamp: Date;
+  readonly timestamp: Date;
 
   /** Logging method. */
-  method: LogMethod;
+  readonly method: LogMethod;
 
-  /** The arguments themselves passed to the log output function. */
+  /**
+   * Arguments passed to the logging method.
+   * 
+   * This array can be modified by the `onLog` callback.
+   * Any changes are reflected in subsequent PrettyConsole processing. 
+   */
   args: unknown[];
 }
 
@@ -263,7 +268,8 @@ export class PrettyConsole {
    */
 
   /**
-   * @param config
+   * Creates a PrettyConsole instance.
+   * @param config  Initial configuration.
    * @default `PrettyConsole.#defaultConf`
    */
   constructor(config: Config = PrettyConsole.#defaultConf) {
@@ -271,8 +277,8 @@ export class PrettyConsole {
   }
 
   /**
-   * Set configuration.
-   * @param config configuration
+   * Update the current configuration with the specified options.
+   * @param config Configuration options to update.
    */
   public setConfig(config: Config): void {
     this.#config = this.#resolvedConfig(config);
@@ -288,7 +294,7 @@ export class PrettyConsole {
   }
 
   /**
-   * Reset current configuration
+   * Reset the current configuration to the default configuration.
    */
   public resetConfig(): void {
     this.setConfig(PrettyConsole.#defaultConf);
@@ -319,7 +325,7 @@ export class PrettyConsole {
     if (this.#config.callStack) {
       const obj: { stack?: string } = {};
       Error.captureStackTrace(obj, this.trace);
-      obj.stack = obj.stack ? obj.stack.replace('Error', 'Call stack') : `Call stack: couldn't get`;
+      obj.stack = obj.stack ? obj.stack.replace(/^Error\b/, 'Call stack') : `Call stack: couldn't get`;
       args.push('\n' + obj.stack);
     }
     this.#output('trace', args, (...a) => this.#logger.trace(...a));
@@ -388,7 +394,7 @@ export class PrettyConsole {
   }
 
   /**
-   * Validate the configuration settings and assign default values ​​to any unspecified settings.
+   * Validate the configuration settings and fill unspecified options with their current values.
    *
    * @internal
    * @param config  
@@ -404,14 +410,21 @@ export class PrettyConsole {
       }
     }
 
-    const validator: Record<keyof Config, (v: any) => boolean> = {
+    const validator: Record<keyof Config, (v: unknown) => boolean> = {
       level:          (v) => typeof v === 'string' && Object.hasOwn(logLevels, v),
       timestamp:      (v) => typeof v === 'boolean',
       levelName:      (v) => typeof v === 'boolean',
       callStack:      (v) => typeof v === 'boolean',
       provider:       (v) => {
-        return v != null  && Boolean(v.log) && Boolean(v.trace) && Boolean(v.debug) &&
-          Boolean(v.info)  && Boolean(v.warn)  && Boolean(v.error);
+        if (typeof v !== 'object' || v === null) return false;
+        const p = v as Partial<LogProvider>;
+        return typeof p.log === 'function' &&
+          typeof p.trace === 'function' &&
+          typeof p.debug === 'function' &&
+          typeof p.info === 'function' &&
+          typeof p.warn === 'function' &&
+          typeof p.error === 'function' &&
+          (p.fatal === undefined || typeof p.fatal === 'function');
       },
       pretty:         (v) => typeof v === 'boolean',
       onLog:          (v) => typeof v === 'function',
@@ -435,10 +448,10 @@ export class PrettyConsole {
   }
 
   /**
-   * Format the values ​​in the array.
+   * Format the log arguments.
    * 
    * @param args  An array of values ​​to be output.
-   * @param date
+   * @param date  Timestamp for this log entry.
    * @returns An array of formatted values ​​to be output, or a `string`.
    */
   #format(method: LogMethod, date: Date, args: unknown[]): unknown[] {
@@ -448,10 +461,10 @@ export class PrettyConsole {
   }
 
   /**
-   * Format a Date instance or UTC time (in milliseconds). 
+   * Format a Date instance. 
    * 
-   * @param date    `Date` instance.
-   * @returns A formatted datetime string.
+   * @param date  Date to format.
+   * @returns A formatted date-time string.
    */
   #formatDate(date: Date) {
     return DateFormatter.format(new Date(date), "yyyy-MM-dd HH:mm:ss.fff");
@@ -483,12 +496,12 @@ export class PrettyConsole {
    */
   #output(method: LogMethod, args: unknown[], logFn: (...a: unknown[]) => void): void {
     const date: Date = new Date();
+    const logEntry: LogEntry = this.#getLogEntry(method, new Date(date), args);
     if (this.#config.onLog) {
-      const logEntry: LogEntry = this.#getLogEntry(method, date, args);
       this.#config.onLog(logEntry);
     }
     if (this.#shouldLog(method)) {
-      logFn(...this.#format(method, date, args));
+      logFn(...this.#format(method, date, logEntry.args));
     }
   }
 
@@ -496,7 +509,7 @@ export class PrettyConsole {
    * Obtain the log information to be passed to `Config.onLog`.
    */
   #getLogEntry(method: LogMethod, date: Date, args: unknown[]): LogEntry {
-    return { timestamp: date, method, args }
+    return { timestamp: new Date(date), method, args }
   }
 
   /**
