@@ -1,6 +1,6 @@
 {
   "name": "@ayapapa-npm/pretty-console-js",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A tiny wrapper around the standard Node.js `console`.",
   "license": "MIT",
   "author": "ayapapa",
@@ -14,7 +14,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "badges"
   ],
   "engines": {
     "node": ">=20"

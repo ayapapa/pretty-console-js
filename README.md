@@ -1,9 +1,9 @@
 [![CI](https://github.com/ayapapa/pretty-console/actions/workflows/ci.yml/badge.svg)](https://github.com/ayapapa/pretty-console/actions/workflows/ci.yml)
-![Coverage](./badges/coverage-total.svg)
-![Branches](./badges/coverage-branches.svg)
-![Functions](./badges/coverage-functions.svg)
-![Lines](./badges/coverage-lines.svg)
-![Statements](./badges/coverage-statements.svg)
+![Coverage](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/badges/coverage-total.svg)
+![Branches](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/badges/coverage-branches.svg)
+![Functions](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/badges/coverage-functions.svg)
+![Lines](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/badges/coverage-lines.svg)
+![Statements](https://raw.githubusercontent.com/ayapapa/pretty-console-js/main/badges/coverage-statements.svg)
 
 # pretty-console-js
 
