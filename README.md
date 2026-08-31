@@ -94,7 +94,7 @@ PrettyConsole
 ├── warn():             Outputs `warn` level log.
 ├── error():            Outputs `error` level log.
 ├── fatal():            Outputs `fatal` level log.
-├── setConfig():        Update the current configuration with the specified options.
+├── setConfig():        Update the current configuration. Unspecified options keep their current values.
 ├── getConfig():        Get the current settings.
 ├── resetConfig():      Reset settings (return to default settings).
 └── getDefaultConfig(): Get the default settings.
@@ -112,11 +112,11 @@ For more information, see the description of
 
 | Option        | Type      | Default       | Description      |
 | ------------- | --------- | ------------- | ---------------- |
-| `level`       | `string` | `'info'`      | The minimum log level to display. Valid values: `'trace'`, `'debug'`, `'info'`, `'warn'`, `'error'`, `'fatal'`, and `'silent'`. Order: `'trace'` < `'debug'` < `'info'` < `'warn'` < `'error'` < `'fatal'` < `'silent'` |
+| `level`       | `string` | `'info'`      | The minimum log level to display for `trace()`, `debug()`, `info()`, `warn()`, `error()`, and `fatal()`. <br>`log()` is output regardless of the configured level, except when level is 'silent'. <br>Valid values are 'trace', 'debug', 'info', 'warn', 'error', 'fatal', and 'silent'. <br><br>The log levels are ordered from most verbose to least verbose as follows: trace < debug < info < warn < error < fatal. <br><br>'silent' disables all output. |
 | `timestamp`   | `boolean` | `true` | If `true`, includes a timestamp in the output. |
 | `levelName`   | `boolean` | `true` | If `true`, includes the log level name (e.g., TRACE, DEBUG). |
 | `callStack`   | `boolean` | `false` | If `true`, includes the call stack for `trace`-level logs. This is an option for `console.trace()` compatibility; therefore, it applies only to logs at the `trace` level. |
-| `provider`    | `LogProvider` | `console` | Specifies alternative to `console`. |
+| `provider`    | `LogProvider` | `console` | Specifies an alternative to `console`.  <br>`LogProvider` is the type of the `console` replacement object. <br>`fatal` is optional. If it is not provided, PrettyConsole.fatal() falls back to the provider's error() method. |
 | `pretty`      | `boolean` | `true` | If `true`, uses PrettyConsole's `pretty` output.          |
 | `onLog`       | `(logEntry: LogEntry) => void` | `undefined` | A callback function that receives each log call before level filtering and formatting. The callback may modify LogEntry.args, and any changes are reflected in subsequent PrettyConsole processing. |
 | `breakLength` | `number`  | `120` | The length at which input values are split across multiple lines. Set to Infinity to format the input as a single line (in combination with compact set to true or any number >= 1). |

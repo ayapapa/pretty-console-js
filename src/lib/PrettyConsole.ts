@@ -19,11 +19,21 @@ export type LogLevel = keyof typeof logLevels;
 /** Compare function type */
 export type CompareFn = <T>(a: T, b: T) => number;
 
-/** Type of the console replacement object. */
+/**
+ * Type of the console replacement object.
+ *
+ * `fatal` is optional. If it is not provided, PrettyConsole.fatal()
+ * falls back to the provider's error() method.
+ */
 export type LogProvider = Pick<Console,  'log' | 'error' | 'warn' | 'info' | 'debug' | 'trace'> & { fatal?: (...a: unknown[]) => void };
 
-/** Log method type */
-export type LogMethod = keyof LogProvider; 
+/**
+ * Logging methods available for output.
+ *
+ * `silent` is intentionally excluded because it is a log level,
+ * not a logging method.
+ */
+export type LogMethod = Exclude<LogLevel, 'silent'>;
 
 /** LogEntry type */
 export interface LogEntry {
@@ -278,6 +288,8 @@ export class PrettyConsole {
 
   /**
    * Update the current configuration with the specified options.
+   * Unspecified options retain their current values.
+   *
    * @param config Configuration options to update.
    */
   public setConfig(config: Config): void {
@@ -377,7 +389,7 @@ export class PrettyConsole {
    * @returns true if `method` is enabled by the current log level, and false otherwise.
    */
   #shouldLog(method: LogMethod): boolean {
-    return logLevels[method as LogLevel] >= logLevels[this.#config.level ?? PrettyConsole.#defaultLevel];
+    return logLevels[method] >= logLevels[this.#config.level ?? PrettyConsole.#defaultLevel];
   }
 
   /**

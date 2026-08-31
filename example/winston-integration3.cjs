@@ -1,5 +1,5 @@
 /**
- * `winston` integration sample 2:
+ * `winston` integration sample 3:
  * A case where output to the console uses `PrettyConsole` 
  * and output to a file uses `winston`.
  */

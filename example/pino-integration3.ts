@@ -1,7 +1,7 @@
 /**
- * `pino` integration sample 2:
- * A case where an `Error` instance is passed as the first argument 
- * to the `pino` logging function when such an instance is present.
+ * `pino` integration sample 3:
+ * A case where output to the console uses `PrettyConsole` 
+ * and output to a file uses `pino`.
  */
 import { PrettyConsole, type LogEntry } from '@ayapapa-npm/pretty-console-js';
 import pino from 'pino';

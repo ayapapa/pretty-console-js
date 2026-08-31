@@ -1,7 +1,7 @@
 /**
- * `winston` integration sample 2:
- * A case where an `Error` instance is specially handled
- * when such an instance is present.
+ * `winston` integration sample 3:
+ * A case where output to the console uses `PrettyConsole` 
+ * and output to a file uses `winston`.
  */
 import { PrettyConsole, type LogEntry } from '@ayapapa-npm/pretty-console-js';
 import winston from 'winston';

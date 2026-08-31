@@ -593,62 +593,146 @@ describe('PrettyConsole', () => {
     );
   });
 
-it('should reflect additions to LogEntry.args made by onLog', () => {
-  const provider = createMockProvider();
+  it('should reflect additions to LogEntry.args made by onLog', () => {
+    const provider = createMockProvider();
 
-  const pc = new PrettyConsole({
-    provider,
-    onLog: (entry) => {
-      entry.args.push('added');
-    },
+    const pc = new PrettyConsole({
+      provider,
+      onLog: (entry) => {
+        entry.args.push('added');
+      },
+    });
+
+    pc.info('original');
+
+    expect(provider.info).toHaveBeenCalledWith(
+      expect.any(String),
+      'INFO:',
+      'original',
+      'added',
+    );
   });
 
-  pc.info('original');
+  it('should reflect modifications to LogEntry.args made by onLog', () => {
+    const provider = createMockProvider();
 
-  expect(provider.info).toHaveBeenCalledWith(
-    expect.any(String),
-    'INFO:',
-    'original',
-    'added',
-  );
-});
+    const pc = new PrettyConsole({
+      provider,
+      onLog: (entry) => {
+        entry.args[0] = 'modified';
+      },
+    });
 
-it('should reflect modifications to LogEntry.args made by onLog', () => {
-  const provider = createMockProvider();
+    pc.info('original');
 
-  const pc = new PrettyConsole({
-    provider,
-    onLog: (entry) => {
-      entry.args[0] = 'modified';
-    },
+    expect(provider.info).toHaveBeenCalledWith(
+      expect.any(String),
+      'INFO:',
+      'modified',
+    );
   });
 
-  pc.info('original');
+  it('should reflect replacement of LogEntry.args made by onLog', () => {
+    const provider = createMockProvider();
 
-  expect(provider.info).toHaveBeenCalledWith(
-    expect.any(String),
-    'INFO:',
-    'modified',
-  );
-});
+    const pc = new PrettyConsole({
+      provider,
+      onLog: (entry) => {
+        entry.args = ['replaced'];
+      },
+    });
 
-it('should reflect replacement of LogEntry.args made by onLog', () => {
-  const provider = createMockProvider();
+    pc.info('original');
 
-  const pc = new PrettyConsole({
-    provider,
-    onLog: (entry) => {
-      entry.args = ['replaced'];
-    },
+    expect(provider.info).toHaveBeenCalledWith(
+      expect.any(String),
+      'INFO:',
+      'replaced',
+    );
   });
 
-  pc.info('original');
+  it('throws when provider methods are not functions', () => {
+    const invalidProvider = {
+      log: true,
+      trace: true,
+      debug: true,
+      info: true,
+      warn: true,
+      error: true,
+    };
 
-  expect(provider.info).toHaveBeenCalledWith(
-    expect.any(String),
-    'INFO:',
-    'replaced',
-  );
-});
+    expect(() =>
+      new PrettyConsole({
+        provider: invalidProvider as unknown as LogProvider,
+      }),
+    ).toThrow(TypeError);
+  });
+
+  const testOneInvalidMethodLoggerInjection = (invalidValue: { [key:string]: unknown }): void => {
+    const invalidProvider = createMockProvider();
+    Object.assign(invalidProvider, invalidValue)
+
+    expect(() =>
+      new PrettyConsole({
+        provider: invalidProvider as unknown as LogProvider,
+      }),
+    ).toThrow(TypeError);
+  }
+
+  it('throws when one provider method are not functions.(trace: true)', () => {
+    testOneInvalidMethodLoggerInjection({ trace: true });
+  });
+
+  it('throws when one provider method are not functions.(trace: {})', () => {
+    testOneInvalidMethodLoggerInjection({ trace: {} });
+  });
+
+  it('throws when one provider method are not functions.(debug: true)', () => {
+    testOneInvalidMethodLoggerInjection({ debug: true });
+  });
+
+  it('throws when one provider method are not functions.(debug: {})', () => {
+    testOneInvalidMethodLoggerInjection({ debug: {} });
+  });
+
+  it('throws when one provider method are not functions.(info: true)', () => {
+    testOneInvalidMethodLoggerInjection({ info: true });
+  });
+
+  it('throws when one provider method are not functions.(info: {})', () => {
+    testOneInvalidMethodLoggerInjection({ info: {} });
+  });
+
+  it('throws when one provider method are not functions.(warn: true)', () => {
+    testOneInvalidMethodLoggerInjection({ warn: true });
+  });
+
+  it('throws when one provider method are not functions.(warn: {})', () => {
+    testOneInvalidMethodLoggerInjection({ warn: {} });
+  });
+
+  it('throws when one provider method are not functions.(error: true)', () => {
+    testOneInvalidMethodLoggerInjection({ error: true });
+  });
+
+  it('throws when one provider method are not functions.(error: {})', () => {
+    testOneInvalidMethodLoggerInjection({ error: {} });
+  });
+
+  it('throws when one provider method are not functions.(fatal: true)', () => {
+    testOneInvalidMethodLoggerInjection({ fatal: true });
+  });
+
+  it('throws when one provider method are not functions.(fatal: {})', () => {
+    testOneInvalidMethodLoggerInjection({ fatal: {} });
+  });
+
+  it('throws when one provider method are not functions.(log: true)', () => {
+    testOneInvalidMethodLoggerInjection({ log: true });
+  });
+
+  it('throws when one provider method are not functions.(log: {})', () => {
+    testOneInvalidMethodLoggerInjection({ log: {} });
+  });
 
 });
