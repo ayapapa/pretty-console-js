@@ -6,7 +6,7 @@
 
 # Interface: Config
 
-Defined in: [lib/PrettyConsole.ts:63](https://github.com/ayapapa/pretty-console/blob/312d8faa5837375b39a1fd3234a99c3d01569712/src/lib/PrettyConsole.ts#L63)
+Defined in: [lib/PrettyConsole.ts:63](https://github.com/ayapapa/pretty-console/blob/5cb29799ce6adb11e67fda51ea3cad5f86aa6fde/src/lib/PrettyConsole.ts#L63)
 
 configuration definition. 
 The 'breakLength' option and what follows are options that are passed directly
@@ -21,7 +21,7 @@ For more information, see the description of
 
 > `optional` **breakLength?**: `number`
 
-Defined in: [lib/PrettyConsole.ts:134](https://github.com/ayapapa/pretty-console/blob/312d8faa5837375b39a1fd3234a99c3d01569712/src/lib/PrettyConsole.ts#L134)
+Defined in: [lib/PrettyConsole.ts:134](https://github.com/ayapapa/pretty-console/blob/5cb29799ce6adb11e67fda51ea3cad5f86aa6fde/src/lib/PrettyConsole.ts#L134)
 
 Specifies the length at which input values are split across multiple lines.
 Set to Infinity to format the input as a single line
@@ -40,7 +40,7 @@ If omitted, default to `120`.
 
 > `optional` **callStack?**: `boolean`
 
-Defined in: [lib/PrettyConsole.ts:105](https://github.com/ayapapa/pretty-console/blob/312d8faa5837375b39a1fd3234a99c3d01569712/src/lib/PrettyConsole.ts#L105)
+Defined in: [lib/PrettyConsole.ts:105](https://github.com/ayapapa/pretty-console/blob/5cb29799ce6adb11e67fda51ea3cad5f86aa6fde/src/lib/PrettyConsole.ts#L105)
 
 Whether to output the call stack in `trace()`. 
 If set to `true`, the call stack is added to `trace`-level logs. 
@@ -59,7 +59,7 @@ false
 
 > `optional` **colors?**: `boolean`
 
-Defined in: [lib/PrettyConsole.ts:143](https://github.com/ayapapa/pretty-console/blob/312d8faa5837375b39a1fd3234a99c3d01569712/src/lib/PrettyConsole.ts#L143)
+Defined in: [lib/PrettyConsole.ts:143](https://github.com/ayapapa/pretty-console/blob/5cb29799ce6adb11e67fda51ea3cad5f86aa6fde/src/lib/PrettyConsole.ts#L143)
 
 Whether to color the output. 
 If set to `true`, the output is styled with ANSI color codes.
@@ -78,7 +78,7 @@ true
 
 > `optional` **compact?**: `number` \| `boolean`
 
-Defined in: [lib/PrettyConsole.ts:155](https://github.com/ayapapa/pretty-console/blob/312d8faa5837375b39a1fd3234a99c3d01569712/src/lib/PrettyConsole.ts#L155)
+Defined in: [lib/PrettyConsole.ts:155](https://github.com/ayapapa/pretty-console/blob/5cb29799ce6adb11e67fda51ea3cad5f86aa6fde/src/lib/PrettyConsole.ts#L155)
 
 Whether to make the object output compact.
 Setting this to false causes each object key to be displayed on a new line.
@@ -100,7 +100,7 @@ false
 
 > `optional` **depth?**: `number` \| `null`
 
-Defined in: [lib/PrettyConsole.ts:163](https://github.com/ayapapa/pretty-console/blob/312d8faa5837375b39a1fd3234a99c3d01569712/src/lib/PrettyConsole.ts#L163)
+Defined in: [lib/PrettyConsole.ts:163](https://github.com/ayapapa/pretty-console/blob/5cb29799ce6adb11e67fda51ea3cad5f86aa6fde/src/lib/PrettyConsole.ts#L163)
 
 Specifies the maximum recursion depth for nested objects.
 Use null to inspect all levels recursively.
@@ -118,7 +118,7 @@ null
 
 > `optional` **level?**: `"silent"` \| `"error"` \| `"log"` \| `"warn"` \| `"info"` \| `"debug"` \| `"trace"` \| `"fatal"`
 
-Defined in: [lib/PrettyConsole.ts:77](https://github.com/ayapapa/pretty-console/blob/312d8faa5837375b39a1fd3234a99c3d01569712/src/lib/PrettyConsole.ts#L77)
+Defined in: [lib/PrettyConsole.ts:77](https://github.com/ayapapa/pretty-console/blob/5cb29799ce6adb11e67fda51ea3cad5f86aa6fde/src/lib/PrettyConsole.ts#L77)
 
 Desired logging level. 
 In order of priority, available levels are:
@@ -143,7 +143,7 @@ If omitted, defaults to `'info'`.
 
 > `optional` **levelName?**: `boolean`
 
-Defined in: [lib/PrettyConsole.ts:96](https://github.com/ayapapa/pretty-console/blob/312d8faa5837375b39a1fd3234a99c3d01569712/src/lib/PrettyConsole.ts#L96)
+Defined in: [lib/PrettyConsole.ts:96](https://github.com/ayapapa/pretty-console/blob/5cb29799ce6adb11e67fda51ea3cad5f86aa6fde/src/lib/PrettyConsole.ts#L96)
 
 Whether to output logging level name. 
 If set to `true`, the log level name is output.
@@ -164,7 +164,7 @@ true
 
 > `optional` **maxArrayLength?**: `number` \| `null`
 
-Defined in: [lib/PrettyConsole.ts:174](https://github.com/ayapapa/pretty-console/blob/312d8faa5837375b39a1fd3234a99c3d01569712/src/lib/PrettyConsole.ts#L174)
+Defined in: [lib/PrettyConsole.ts:174](https://github.com/ayapapa/pretty-console/blob/5cb29799ce6adb11e67fda51ea3cad5f86aa6fde/src/lib/PrettyConsole.ts#L174)
 
 Specifies the maximum number of Array, TypedArray, Map, WeakMap, and WeakSet
 elements to include when formatting. Set to null or Infinity to show all elements.
@@ -185,7 +185,7 @@ If omitted, default to `100`.
 
 > `optional` **maxStringLength?**: `number` \| `null`
 
-Defined in: [lib/PrettyConsole.ts:183](https://github.com/ayapapa/pretty-console/blob/312d8faa5837375b39a1fd3234a99c3d01569712/src/lib/PrettyConsole.ts#L183)
+Defined in: [lib/PrettyConsole.ts:183](https://github.com/ayapapa/pretty-console/blob/5cb29799ce6adb11e67fda51ea3cad5f86aa6fde/src/lib/PrettyConsole.ts#L183)
 
 Specifies the maximum number of characters to include when formatting.
 Set to null or Infinity to show all elements.
@@ -202,26 +202,16 @@ If omitted, default to `12800`.
 
 ### onLog?
 
-> `optional` **onLog?**: (`logEntry`) => `void`
+> `optional` **onLog?**: ((`logEntry`) => `void`) \| `null`
 
-Defined in: [lib/PrettyConsole.ts:125](https://github.com/ayapapa/pretty-console/blob/312d8faa5837375b39a1fd3234a99c3d01569712/src/lib/PrettyConsole.ts#L125)
+Defined in: [lib/PrettyConsole.ts:125](https://github.com/ayapapa/pretty-console/blob/5cb29799ce6adb11e67fda51ea3cad5f86aa6fde/src/lib/PrettyConsole.ts#L125)
 
 A callback function that receives each log call before level filtering and formatting.
-
-#### Parameters
-
-##### logEntry
-
-[`LogEntry`](LogEntry.md)
-
-#### Returns
-
-`void`
 
 #### Default
 
 ```ts
-undefined
+null
 ```
 
 ***
@@ -230,7 +220,7 @@ undefined
 
 > `optional` **pretty?**: `boolean`
 
-Defined in: [lib/PrettyConsole.ts:119](https://github.com/ayapapa/pretty-console/blob/312d8faa5837375b39a1fd3234a99c3d01569712/src/lib/PrettyConsole.ts#L119)
+Defined in: [lib/PrettyConsole.ts:119](https://github.com/ayapapa/pretty-console/blob/5cb29799ce6adb11e67fda51ea3cad5f86aa6fde/src/lib/PrettyConsole.ts#L119)
 
 Whether or not to use PrettyConsole's `pretty` output.
 If omitted, `pretty` is `true`.
@@ -247,7 +237,7 @@ true
 
 > `optional` **provider?**: [`LogProvider`](../type-aliases/LogProvider.md)
 
-Defined in: [lib/PrettyConsole.ts:112](https://github.com/ayapapa/pretty-console/blob/312d8faa5837375b39a1fd3234a99c3d01569712/src/lib/PrettyConsole.ts#L112)
+Defined in: [lib/PrettyConsole.ts:112](https://github.com/ayapapa/pretty-console/blob/5cb29799ce6adb11e67fda51ea3cad5f86aa6fde/src/lib/PrettyConsole.ts#L112)
 
 Alternative to `console`.
 If omitted, `console` is used.
@@ -264,7 +254,7 @@ console
 
 > `optional` **sorted?**: `boolean` \| [`CompareFn`](../type-aliases/CompareFn.md)
 
-Defined in: [lib/PrettyConsole.ts:194](https://github.com/ayapapa/pretty-console/blob/312d8faa5837375b39a1fd3234a99c3d01569712/src/lib/PrettyConsole.ts#L194)
+Defined in: [lib/PrettyConsole.ts:194](https://github.com/ayapapa/pretty-console/blob/5cb29799ce6adb11e67fda51ea3cad5f86aa6fde/src/lib/PrettyConsole.ts#L194)
 
 If set to `true` or a `function`, all properties of an object,
 and Set and Map entries are sorted in the resulting string.
@@ -285,7 +275,7 @@ true
 
 > `optional` **timestamp?**: `boolean`
 
-Defined in: [lib/PrettyConsole.ts:85](https://github.com/ayapapa/pretty-console/blob/312d8faa5837375b39a1fd3234a99c3d01569712/src/lib/PrettyConsole.ts#L85)
+Defined in: [lib/PrettyConsole.ts:85](https://github.com/ayapapa/pretty-console/blob/5cb29799ce6adb11e67fda51ea3cad5f86aa6fde/src/lib/PrettyConsole.ts#L85)
 
 Whether to output timestamps. 
 If set to `true`, the timestamp is output.

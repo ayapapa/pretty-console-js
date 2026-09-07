@@ -120,9 +120,9 @@ export interface Config {
 
   /**
    * A callback function that receives each log call before level filtering and formatting.
-   * @default undefined
+   * @default null
    */
-  onLog?: (logEntry: LogEntry) => void;
+  onLog?: ((logEntry: LogEntry) => void) | null;
 
   /**
    * Specifies the length at which input values are split across multiple lines.
@@ -241,13 +241,14 @@ export class PrettyConsole {
    * @internal 
    * Default configuration.
    */
-  static readonly #defaultConf: Config  = {
+  static readonly #defaultConf: Readonly<Required<Config>>  = {
     level:            PrettyConsole.#defaultLevel,
     timestamp:        true,
     levelName:        true,
     callStack:        false,
     provider:         console,
     pretty:           true,
+    onLog:            null,
     breakLength:      120,
     colors:           true,
     compact:          false,
@@ -277,7 +278,7 @@ export class PrettyConsole {
    * @internal 
    * Current configuration.
    */
-  #config: Config = { ...PrettyConsole.#defaultConf };
+  #config: Required<Config> = { ...PrettyConsole.#defaultConf };
 
   /** 
    * @internal 
@@ -314,7 +315,7 @@ export class PrettyConsole {
    * Get current configuration.
    * @returns Current configuration.
    */
-  public getConfig(): Config {
+  public getConfig(): Required<Config> {
     return {...this.#config};
   }
 
@@ -348,9 +349,9 @@ export class PrettyConsole {
    */
   public trace(...args: unknown[]) {
     if (this.#config.callStack) {
-      const obj: { stack?: string } = {};
+      const obj = { stack: `Call stack: couldn't get` };
       Error.captureStackTrace(obj, this.trace);
-      obj.stack = obj.stack ? obj.stack.replace(/^Error\b/, 'Call stack') : `Call stack: couldn't get`;
+      obj.stack = obj.stack.replace(/^Error\b/, 'Call stack');
       args.push('\n' + obj.stack);
     }
     this.#output('trace', args, (...a) => this.#logger.trace(...a));
@@ -403,14 +404,14 @@ export class PrettyConsole {
    * @returns true if `method` is enabled by the current log level, and false otherwise.
    */
   #shouldLog(method: LogMethod): boolean {
-    return logLevels[method] >= logLevels[this.#config.level ?? PrettyConsole.#defaultLevel];
+    return logLevels[method] >= logLevels[this.#config.level];
   }
 
   /**
    * @internal
    * Resolve the console-compatible logger from the configured provider.
    */
-  #resolveLogger(provider: LogProvider | undefined): LogProvider {
+  #resolveLogger(provider?: LogProvider): LogProvider {
     if (provider === undefined || provider === console) {
       const logger = Object.create(console);
       // Replace `console.trace()` with `debug()` because its default behavior prints a stack trace.
@@ -427,7 +428,7 @@ export class PrettyConsole {
    * @param config  
    * @returns Resolved configuration
   */
-  #resolvedConfig(config: Config): Config {
+  #resolvedConfig(config: Config): Required<Config> {
     const rConf = {...config};
     const checkType = <K extends keyof Config>(key: K , typeChecker: (v: Config[K]) => boolean) => {
       if (Object.hasOwn(config, key)) {
@@ -454,7 +455,7 @@ export class PrettyConsole {
           (p.fatal === undefined || typeof p.fatal === 'function');
       },
       pretty:         (v) => typeof v === 'boolean',
-      onLog:          (v) => typeof v === 'function',
+      onLog:          (v) => typeof v === 'function'|| v === null,
       breakLength:    (v) => typeof v === 'number' ,
       colors:         (v) => typeof v === 'boolean',
       compact:        (v) => typeof v === 'boolean' || typeof v === 'number',

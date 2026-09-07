@@ -6,7 +6,7 @@
 
 # Class: PrettyConsole
 
-Defined in: [lib/PrettyConsole.ts:228](https://github.com/ayapapa/pretty-console/blob/312d8faa5837375b39a1fd3234a99c3d01569712/src/lib/PrettyConsole.ts#L228)
+Defined in: [lib/PrettyConsole.ts:228](https://github.com/ayapapa/pretty-console/blob/5cb29799ce6adb11e67fda51ea3cad5f86aa6fde/src/lib/PrettyConsole.ts#L228)
 
 PrettyConsole, that is a tiny wrapper around the standard Node.js console.
 
@@ -42,7 +42,7 @@ The goal is not to replace logging frameworks such as [Pino](https://www.npmjs.c
 
 > **new PrettyConsole**(`config?`): `PrettyConsole`
 
-Defined in: [lib/PrettyConsole.ts:298](https://github.com/ayapapa/pretty-console/blob/312d8faa5837375b39a1fd3234a99c3d01569712/src/lib/PrettyConsole.ts#L298)
+Defined in: [lib/PrettyConsole.ts:299](https://github.com/ayapapa/pretty-console/blob/5cb29799ce6adb11e67fda51ea3cad5f86aa6fde/src/lib/PrettyConsole.ts#L299)
 
 Creates a PrettyConsole instance.
 
@@ -68,7 +68,7 @@ Initial configuration.
 
 > **debug**(...`args`): `void`
 
-Defined in: [lib/PrettyConsole.ts:363](https://github.com/ayapapa/pretty-console/blob/312d8faa5837375b39a1fd3234a99c3d01569712/src/lib/PrettyConsole.ts#L363)
+Defined in: [lib/PrettyConsole.ts:364](https://github.com/ayapapa/pretty-console/blob/5cb29799ce6adb11e67fda51ea3cad5f86aa6fde/src/lib/PrettyConsole.ts#L364)
 
 Output information at the 'debug' level.
 
@@ -90,7 +90,7 @@ An array of values ​​to be output.
 
 > **error**(...`args`): `void`
 
-Defined in: [lib/PrettyConsole.ts:387](https://github.com/ayapapa/pretty-console/blob/312d8faa5837375b39a1fd3234a99c3d01569712/src/lib/PrettyConsole.ts#L387)
+Defined in: [lib/PrettyConsole.ts:388](https://github.com/ayapapa/pretty-console/blob/5cb29799ce6adb11e67fda51ea3cad5f86aa6fde/src/lib/PrettyConsole.ts#L388)
 
 Output information at the 'error' level.
 
@@ -112,7 +112,7 @@ An array of values ​​to be output.
 
 > **fatal**(...`args`): `void`
 
-Defined in: [lib/PrettyConsole.ts:395](https://github.com/ayapapa/pretty-console/blob/312d8faa5837375b39a1fd3234a99c3d01569712/src/lib/PrettyConsole.ts#L395)
+Defined in: [lib/PrettyConsole.ts:396](https://github.com/ayapapa/pretty-console/blob/5cb29799ce6adb11e67fda51ea3cad5f86aa6fde/src/lib/PrettyConsole.ts#L396)
 
 Output information at the 'fatal' level.
 
@@ -132,15 +132,15 @@ An array of values ​​to be output.
 
 ### getConfig()
 
-> **getConfig**(): [`Config`](../interfaces/Config.md)
+> **getConfig**(): `Required`\<[`Config`](../interfaces/Config.md)\>
 
-Defined in: [lib/PrettyConsole.ts:317](https://github.com/ayapapa/pretty-console/blob/312d8faa5837375b39a1fd3234a99c3d01569712/src/lib/PrettyConsole.ts#L317)
+Defined in: [lib/PrettyConsole.ts:318](https://github.com/ayapapa/pretty-console/blob/5cb29799ce6adb11e67fda51ea3cad5f86aa6fde/src/lib/PrettyConsole.ts#L318)
 
 Get current configuration.
 
 #### Returns
 
-[`Config`](../interfaces/Config.md)
+`Required`\<[`Config`](../interfaces/Config.md)\>
 
 Current configuration.
 
@@ -150,7 +150,7 @@ Current configuration.
 
 > **getDefaultConfig**(): [`Config`](../interfaces/Config.md)
 
-Defined in: [lib/PrettyConsole.ts:332](https://github.com/ayapapa/pretty-console/blob/312d8faa5837375b39a1fd3234a99c3d01569712/src/lib/PrettyConsole.ts#L332)
+Defined in: [lib/PrettyConsole.ts:333](https://github.com/ayapapa/pretty-console/blob/5cb29799ce6adb11e67fda51ea3cad5f86aa6fde/src/lib/PrettyConsole.ts#L333)
 
 Get default configuration.
 
@@ -166,7 +166,7 @@ Default configuration.
 
 > **info**(...`args`): `void`
 
-Defined in: [lib/PrettyConsole.ts:371](https://github.com/ayapapa/pretty-console/blob/312d8faa5837375b39a1fd3234a99c3d01569712/src/lib/PrettyConsole.ts#L371)
+Defined in: [lib/PrettyConsole.ts:372](https://github.com/ayapapa/pretty-console/blob/5cb29799ce6adb11e67fda51ea3cad5f86aa6fde/src/lib/PrettyConsole.ts#L372)
 
 Output information at the 'info' level.
 
@@ -188,7 +188,7 @@ An array of values ​​to be output.
 
 > **log**(...`args`): `void`
 
-Defined in: [lib/PrettyConsole.ts:340](https://github.com/ayapapa/pretty-console/blob/312d8faa5837375b39a1fd3234a99c3d01569712/src/lib/PrettyConsole.ts#L340)
+Defined in: [lib/PrettyConsole.ts:341](https://github.com/ayapapa/pretty-console/blob/5cb29799ce6adb11e67fda51ea3cad5f86aa6fde/src/lib/PrettyConsole.ts#L341)
 
 Output information without a level name. No output is produced when the configured level is `silent`.
 
@@ -210,7 +210,7 @@ An array of values ​​to be output.
 
 > **resetConfig**(): `void`
 
-Defined in: [lib/PrettyConsole.ts:324](https://github.com/ayapapa/pretty-console/blob/312d8faa5837375b39a1fd3234a99c3d01569712/src/lib/PrettyConsole.ts#L324)
+Defined in: [lib/PrettyConsole.ts:325](https://github.com/ayapapa/pretty-console/blob/5cb29799ce6adb11e67fda51ea3cad5f86aa6fde/src/lib/PrettyConsole.ts#L325)
 
 Reset the current configuration to the default configuration.
 
@@ -224,7 +224,7 @@ Reset the current configuration to the default configuration.
 
 > **setConfig**(`config`): `void`
 
-Defined in: [lib/PrettyConsole.ts:308](https://github.com/ayapapa/pretty-console/blob/312d8faa5837375b39a1fd3234a99c3d01569712/src/lib/PrettyConsole.ts#L308)
+Defined in: [lib/PrettyConsole.ts:309](https://github.com/ayapapa/pretty-console/blob/5cb29799ce6adb11e67fda51ea3cad5f86aa6fde/src/lib/PrettyConsole.ts#L309)
 
 Update the current configuration with the specified options.
 Unspecified options retain their current values.
@@ -247,7 +247,7 @@ Configuration options to update.
 
 > **trace**(...`args`): `void`
 
-Defined in: [lib/PrettyConsole.ts:349](https://github.com/ayapapa/pretty-console/blob/312d8faa5837375b39a1fd3234a99c3d01569712/src/lib/PrettyConsole.ts#L349)
+Defined in: [lib/PrettyConsole.ts:350](https://github.com/ayapapa/pretty-console/blob/5cb29799ce6adb11e67fda51ea3cad5f86aa6fde/src/lib/PrettyConsole.ts#L350)
 
 Output information at the 'trace' level.
 If 'callStack' is true, the call stack is also output.
@@ -270,7 +270,7 @@ An array of values ​​to be output.
 
 > **warn**(...`args`): `void`
 
-Defined in: [lib/PrettyConsole.ts:379](https://github.com/ayapapa/pretty-console/blob/312d8faa5837375b39a1fd3234a99c3d01569712/src/lib/PrettyConsole.ts#L379)
+Defined in: [lib/PrettyConsole.ts:380](https://github.com/ayapapa/pretty-console/blob/5cb29799ce6adb11e67fda51ea3cad5f86aa6fde/src/lib/PrettyConsole.ts#L380)
 
 Output information at the 'warn' level.
 
@@ -292,7 +292,7 @@ An array of values ​​to be output.
 
 > `static` **getDefaultConfig**(): [`Config`](../interfaces/Config.md)
 
-Defined in: [lib/PrettyConsole.ts:268](https://github.com/ayapapa/pretty-console/blob/312d8faa5837375b39a1fd3234a99c3d01569712/src/lib/PrettyConsole.ts#L268)
+Defined in: [lib/PrettyConsole.ts:269](https://github.com/ayapapa/pretty-console/blob/5cb29799ce6adb11e67fda51ea3cad5f86aa6fde/src/lib/PrettyConsole.ts#L269)
 
 Get default configuration.
 
