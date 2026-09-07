@@ -77,7 +77,6 @@ To address this, I also added functionality to integrate with a standard file lo
 
 The goal is **not** to replace logging frameworks such as [Pino](https://www.npmjs.com/package/pino) or [Winston](https://www.npmjs.com/package/winston), but to make the built-in `console` more pleasant to use during development. <br>
 
-
 ## Installation
 
 ```bash
@@ -85,6 +84,7 @@ npm install @ayapapa-npm/pretty-console-js
 ```
 
 ## List of APIs
+API details are [here](https://github.com/ayapapa/pretty-console-js/blob/main/docs/api.md).
 ```
 PrettyConsole
 ├── log():              Outputs if level specified other than `silent`.

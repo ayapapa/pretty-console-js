@@ -230,10 +230,17 @@ export class PrettyConsole {
   /** 
    * Static fields
    */
-  /** Default logging level */
+
+  /** 
+   * @internal 
+   * Default logging level.
+   */
   static readonly #defaultLevel: LogLevel = 'info';
 
-  /** Default configuration */
+  /** 
+   * @internal 
+   * Default configuration.
+   */
   static readonly #defaultConf: Config  = {
     level:            PrettyConsole.#defaultLevel,
     timestamp:        true,
@@ -263,13 +270,19 @@ export class PrettyConsole {
   }
 
   /** 
-   * Instance fields
+   * Instance fields.
    */
 
-  /** Current configuration */
+  /** 
+   * @internal 
+   * Current configuration.
+   */
   #config: Config = { ...PrettyConsole.#defaultConf };
 
-  /** Logger. */
+  /** 
+   * @internal 
+   * Logger.
+   */
   #logger: LogProvider = console;
 
 
@@ -384,6 +397,7 @@ export class PrettyConsole {
   }
 
   /**
+   * @internal
    * Check whether to output logs.
    * @param method Log method.
    * @returns true if `method` is enabled by the current log level, and false otherwise.
@@ -393,6 +407,7 @@ export class PrettyConsole {
   }
 
   /**
+   * @internal
    * Resolve the console-compatible logger from the configured provider.
    */
   #resolveLogger(provider: LogProvider | undefined): LogProvider {
@@ -406,9 +421,9 @@ export class PrettyConsole {
   }
 
   /**
+   * @internal
    * Validate the configuration settings and fill unspecified options with their current values.
    *
-   * @internal
    * @param config  
    * @returns Resolved configuration
   */
@@ -460,6 +475,7 @@ export class PrettyConsole {
   }
 
   /**
+   * @internal
    * Format the log arguments.
    * 
    * @param args  An array of values ​​to be output.
@@ -483,6 +499,7 @@ export class PrettyConsole {
   }
 
   /**
+   * @internal
    * Add a prefix to the array of output values.
    * 
    * @param args  An array of values ​​to be output.
@@ -500,6 +517,7 @@ export class PrettyConsole {
   }
 
   /**
+   * @internal
    * Output log.
    * 
    * @param method Log method.
@@ -518,6 +536,7 @@ export class PrettyConsole {
   }
 
   /**
+   * @internal
    * Obtain the log information to be passed to `Config.onLog`.
    */
   #getLogEntry(method: LogMethod, date: Date, args: unknown[]): LogEntry {
@@ -525,6 +544,7 @@ export class PrettyConsole {
   }
 
   /**
+   * @internal
    * Format the log arguments as specified. This is one of the purposes of this library.
    */ 
   #toPretty(args: unknown[]): unknown[] {
