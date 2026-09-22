@@ -43,7 +43,7 @@ jobs:
         run: npm run coverage
 
       - name: Generate coverage badges
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.node-version == '20.x'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.node-version == '22.x'
         uses: jpb06/coverage-badges-action@latest
         with:
           coverage-summary-path: coverage/coverage-summary.json
