@@ -8,7 +8,7 @@
 
 > **CompareFn** = \<`T`\>(`a`, `b`) => `number`
 
-Defined in: [lib/PrettyConsole.ts:20](https://github.com/ayapapa/pretty-console/blob/f7f634e3e0b9473447dc413f2804b23b17ad48a4/src/lib/PrettyConsole.ts#L20)
+Defined in: [lib/PrettyConsole.ts:20](https://github.com/ayapapa/pretty-console/blob/498049889b4e266a915e07bf838a5862ee96a1f3/src/lib/PrettyConsole.ts#L20)
 
 Compare function type
 

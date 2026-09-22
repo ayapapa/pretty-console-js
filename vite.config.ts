@@ -14,6 +14,9 @@ export default defineConfig({
   },
   // Write settings to disable only in the test environment here.
   test: {
+    // Prevent vitest from capturing `console`.
+    disableConsoleIntercept: true,
+
     // File patterns to exclude
     exclude: [...configDefaults.exclude, 'e2e/*'],
     
