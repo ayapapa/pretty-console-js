@@ -19,6 +19,7 @@ export default defineConfig({
     
     // Coverage measurement settings
     coverage: {
+      provider: 'v8', // 'istanbul'
       reporter: ['text', 'text-summary', 'json-summary', 'json', 'html'],
       include: ['src/**/*.{ts,tsx,js,jsx}'],
     },
