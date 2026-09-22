@@ -552,7 +552,7 @@ export class PrettyConsole {
     return Boolean(this.#config.pretty) === false ? 
       args : 
       args.map((value: unknown) => {
-      if (value == null || value instanceof Error) {
+      if (value == null /*|| value instanceof Error*/) {
         return value;
       }
       if (typeof value === "object") {

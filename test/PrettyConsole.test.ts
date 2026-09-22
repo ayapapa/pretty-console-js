@@ -248,9 +248,9 @@ describe('PrettyConsole', () => {
 
     const args = provider.error.mock.calls[0];
     expect(args[1]).toContain('ERROR:');
-    expect(args[2] instanceof Error).toBeTruthy();
-    expect(args[2].message).toContain(msg);
-    expect(args[2].stack).toContain('PrettyConsole.test.ts');
+    expect(typeof args[2]).toBe('string');
+    expect(args[2]).toContain(msg);
+    expect(args[2]).toContain('PrettyConsole.test.ts');
   });
 
   it('Output object.', () => {
@@ -733,6 +733,50 @@ describe('PrettyConsole', () => {
 
   it('throws when one provider method are not functions.(log: {})', () => {
     testOneInvalidMethodLoggerInjection({ log: {} });
+  });
+
+  it('Error object with a depth of 3 or greater.', () => {
+    const logger = new PrettyConsole( );
+
+    // For nesting depths of 3 or greater, arrays are abbreviated as `[Array]` in standard console output.
+    const err = Object.assign(new Error("Test_added_Code_Array_ARRAY"), { Code: 'ETEST', array: [123, "hello", { array: ["hoge", 999 ]} ] });
+
+    let stdOutput = ''
+    let stdError = ''
+
+    const spyStd = vi.spyOn(process.stdout, 'write').mockImplementation((chunk: any) => {
+        stdOutput += String(chunk)
+        return true
+      });
+    const spyErr = vi.spyOn(process.stderr, 'write').mockImplementation((chunk: any) => {
+        stdError += String(chunk)
+        return true
+      });
+
+    try {
+      logger.setConfig({ depth: 4 });
+      logger.info(err);
+      logger.error(err);
+      expect(stdOutput).toContain("hoge")
+      expect(stdOutput).toContain("999")
+      expect(stdError).toContain("hoge")
+      expect(stdError).toContain("999")
+    
+      // clear
+      stdOutput = ''
+      stdError = ''
+      logger.setConfig({ depth: 1 });
+      logger.info(err);
+      logger.error(err);
+      expect(stdOutput).not.toContain("hoge")
+      expect(stdOutput).not.toContain("999")
+      expect(stdError).not.toContain("hoge")
+      expect(stdError).not.toContain("999")
+    }
+    finally {
+      spyStd.mockRestore()
+      spyErr.mockRestore()
+    }
   });
 
 });
