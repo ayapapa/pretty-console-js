@@ -8,7 +8,7 @@
 
 > **LogMethod** = `Exclude`\<[`LogLevel`](LogLevel.md), `"silent"`\>
 
-Defined in: [lib/PrettyConsole.ts:36](https://github.com/ayapapa/pretty-console/blob/498049889b4e266a915e07bf838a5862ee96a1f3/src/lib/PrettyConsole.ts#L36)
+Defined in: [lib/PrettyConsole.ts:36](https://github.com/ayapapa/pretty-console/blob/252193cd69712d8da01280d70f6d82049164d38f/src/lib/PrettyConsole.ts#L36)
 
 Logging methods available for output.
 
