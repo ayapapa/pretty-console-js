@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, type Mock } from 'vitest';
-import { PrettyConsole, type LogLevel, type Config, type ConfigKey, type CompareFn, type LogEntry, type LogMethod, type LogProvider } from '../src/index.ts';
-import { pino, transport, LevelWithSilentOrString, LoggerOptions } from 'pino';
+import { PrettyConsole, type LogLevel, type Config, type ConfigKey, type LogEntry, type LogMethod, type LogProvider } from '../src/index.ts';
+import { pino, type LoggerOptions } from 'pino';
 import { Writable } from 'node:stream'
 
 const pinoOptions: LoggerOptions = {
@@ -109,17 +109,17 @@ describe('PrettyConsole', () => {
 
   it('current configurations are invariant', () => {
     const logger = new PrettyConsole();
-    let conf = logger.getConfig();
+    const conf = logger.getConfig() as Record<string, unknown>;
     Object.assign(conf, testConf);
     expect(equalConfigs(logger.getDefaultConfig(), logger.getConfig())).toBe(true);
   });
 
   it('current configurations are invariant', () => {
-    const conf = { provider: null }
+    const conf = { provider: null } as unknown as Config;
     expect.assertions(1);
     try {
       // Forced type assertion for testing.
-      new PrettyConsole(conf as any);
+      new PrettyConsole(conf);
     }
     catch (err) {
       expect(err instanceof TypeError).toBeTruthy();
@@ -174,7 +174,7 @@ describe('PrettyConsole', () => {
         sorted: true,
       },
     ];
-    const keys = Object.keys(testConf) as Array<keyof Config>;
+
     for (let i = 0; i < testConfs.length; i++) {
       const conf = logger.getConfig();
       const newConf: Config = {};
@@ -349,19 +349,17 @@ describe('PrettyConsole', () => {
     expect(entry.args).toContain('This is an info message');
   });
 
-  const checkInvalidProperty = (key: ConfigKey , values: any[]) => {
+  const checkInvalidProperty = (key: ConfigKey , values: unknown[]) => {
     expect.assertions(2 * values.length);
     values.forEach((v) => {
-      const config: Config = {};
+      const config = {} as Record<string, unknown>;
       config[key] = v;
-      let logger: PrettyConsole;
       try {
-        logger = new PrettyConsole(config);
+        new PrettyConsole(config);
       }
-      catch (err: any) {
+      catch (err) {
         expect(err).instanceOf(Error);
-        expect(err.message).toContain(`Type mismatch for config.${key}`);
-        //expect(() => logger.setConfig(config)).toThrow(`Type mismatch for config.${key}`);
+        expect((err as Error).message).toContain(`Type mismatch for config.${key}`);
       }
     });
   };
@@ -435,8 +433,6 @@ describe('PrettyConsole', () => {
     const obj = { x: 124, y: "hello" };
     const num1 = 123456;
     const num2 = 0.00099;
-    const str = "This is a string.";
-    const err = Object.assign(new Error("#ERROR#"), { code: "ETEST" });
 
     await testOutputString(
       [JSON.stringify(obj).replace('{', '').replace('}', ''), String(num1)], 
@@ -744,11 +740,11 @@ describe('PrettyConsole', () => {
     let stdOutput = ''
     let stdError = ''
 
-    const spyStd = vi.spyOn(process.stdout, 'write').mockImplementation((chunk: any) => {
+    const spyStd = vi.spyOn(process.stdout, 'write').mockImplementation((chunk: unknown) => {
         stdOutput += String(chunk)
         return true
       });
-    const spyErr = vi.spyOn(process.stderr, 'write').mockImplementation((chunk: any) => {
+    const spyErr = vi.spyOn(process.stderr, 'write').mockImplementation((chunk: unknown) => {
         stdError += String(chunk)
         return true
       });
